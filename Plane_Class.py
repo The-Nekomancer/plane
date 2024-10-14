@@ -5,8 +5,6 @@ Created on Mon Sep 23 16:57:00 2024
 @author: mjb7tf
 """
 import numpy as np
-import math
-
 # All measurements are in inch, pounds, seconds
 
 class Plane:
@@ -20,9 +18,9 @@ class Plane:
                  chord_length = 12.0,
                  airfoil = naca_2412,
                  payload = 10.0,
-                 cruise_velocity = 540,
+                 cruise_velocity = 520,
                  priority = "Lift",
-                 motor = 10.0):
+                 motor = 2.0):
         self.name = name
         self.wingspan = wingspan
         self.chord_length = chord_length
@@ -44,32 +42,16 @@ class Plane:
         D = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * self.CD * self.wingspan * self.chord_length)/144
         return D
     
-    def determine_wing_properties(self):
+    def change_lift(self):
         L = self.calc_lift()
-        if self.priority == "Lift":
-            while self.weight > L:
-                self.wingspan = self.wingspan * 1.01
-                self.chord_length = self.chord_length * 1.01
-                L = self.calc_lift()
-                self.wingspan = np.ceil(self.wingspan)
-                self.chord_length = np.ceil(self.chord_length)
-         
-        if self.priority == "Speed":
-            while self.weight > L:
-                self.cruise_velocity = self.cruise_velocity*1.01
-                L = self.calc_lift()
-                self.cruise_velocity = np.ceil(self.cruise_velocity)
-             
-        if self.priority == "Range":
-            self.airfoil = self.naca_0012
+        while self.weight > L:
+            self.wingspan = self.wingspan * 1.01
+            self.chord_length = self.chord_length * 1.01
             L = self.calc_lift()
-            while self.weight > L:
-                self.payload = self.payload * 0.99
-                self.weight = self.payload*3
-                 
-        return L
-
-    def calc_vel(self):
+        self.wingspan = np.ceil(self.wingspan)
+        self.chord_length = np.ceil(self.chord_length)
+    
+    def change_velocity(self):
         D = self.calc_drag()
         while D < self.motor:
             self.cruise_velocity = self.cruise_velocity * 1.01
@@ -80,3 +62,26 @@ class Plane:
             D = self.calc_drag()
 
         return self.cruise_velocity
+            
+    def change_drag(self):
+        L = self.calc_lift()
+        while self.weight < L:
+            self.wingspan = self.wingspan * 0.99
+            self.chord_length = self.chord_length * 0.99
+            L = self.calc_lift()
+        self.wingspan = np.ceil(self.wingspan)
+        self.chord_length = np.ceil(self.chord_length)
+    
+    def determine_wing_properties(self):
+        print("weight: " + str(self.weight))
+        if self.priority == "Lift":
+            self.change_lift()
+            self.change_velocity()
+            self.change_drag()
+            
+        if self.priority == "Speed":
+            self.change_velocity()
+            
+        if self.priority == "Range":
+            self.decrease_drag()
+            
