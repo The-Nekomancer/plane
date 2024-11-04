@@ -1,14 +1,13 @@
 import math
 
-def fuse_equations():
+def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan):
     
-    fuse_diam = 10
+    #fuse_diam = 10
     fuse_rad = fuse_diam /2
     fuse_length = 25
-    wingspan = 100
+    #wingspan = 100
     wing_mount_diam = 3
-    tail_chord_length = 3
-    wing_chord_length = 5
+    #wing_chord_length = 5
     wing_rotation_hor = 0.25 * fuse_length
     wing_rotation_vert = 0.6 * fuse_rad
     tail_length = fuse_length * 1.5
@@ -23,7 +22,14 @@ def fuse_equations():
     tri_degrees = 45
     tail_connect_top = fuse_rad - wing_rotation_vert + (fuse_rad * 0.05)
     tail_connect_bottom = math.sqrt((tail_rad**2)-(tri_length/2)**2)
-    tail_chord_length = 
+    tail_base_len = math.sqrt((tail_rad**2)-(tri_length/2)**2)
+    tail_gamma = math.acos((-(tail_base_len**2)+(tail_rad**2)+((tri_length/2)**2))/(2*(tri_length/2)*tail_base_len))
+    tail_angle_of_int = math.pi - 2*(math.pi - tail_gamma - math.pi/4)
+    fillet_rad = 0.1 ## inches
+    tail_chord_length = math.sqrt((tail_rad**2)+(tail_rad**2)-2*(tail_rad)*(tail_rad)*math.cos(tail_angle_of_int)) - 2*fillet_rad
+    tail_offset = 2
+    vtail_length = tail_length - tail_offset - 2
+    
     
     f = open("assem equations.txt", "w")
     f.write('"fuse_diam"= ' + str(fuse_diam)) #fuselage diameter
@@ -45,6 +51,9 @@ def fuse_equations():
     f.write('\n"wing_chord_length"= ' + str(wing_chord_length))
     f.write('\n"tri_length"= ' + str(tri_length))
     f.write('\n"tri_degrees"= ' + str(tri_degrees))
+    f.write('\n"tail_offset"= ' + str(tail_offset))
+    f.write('\n"vtail_length"= ' + str(vtail_length))
+    f.write('\n"fillet_rad"= ' + str(fillet_rad))
     f.write('\n"tail_connect_top"= ' + str(tail_connect_top))
     f.write('\n"tail_connect_bottom"= ' + str(tail_connect_bottom))
     f.close()

@@ -12,15 +12,17 @@ class Plane:
     airfoils = (["naca_0012", "naca_2412"])
     naca_0012 = {"cl": 0.8892, "alpha": 8.5, "cd": 0.01167, "L/D": 40 }
     naca_2412 = {"cl": 1.0581, "alpha": 7, "cd": 0.02483, "L/D": 28 }
-    priority = {"Lift", "Speed", "Range"}
+    priority = {"Lift", "High Speed", "Range", "Low Speed"}
     def __init__(self, name = "test plane",
-                 wingspan = 84, 
-                 chord_length = 12.0,
+                 wingspan = 100, 
+                 chord_length = 5,
                  airfoil = naca_2412,
                  payload = 10.0,
-                 cruise_velocity = 520,
+                 cruise_velocity = 600,
                  priority = "Lift",
-                 motor = 2.0):
+                 motor = 2.0,
+                 fuse_diam = 10,
+                 fuse_length = 25,):
         self.name = name
         self.wingspan = wingspan
         self.chord_length = chord_length
@@ -30,6 +32,8 @@ class Plane:
         self.weight = payload*3
         self.priority = priority
         self.motor  = motor
+        self.fuse_diam = fuse_diam
+        self.fuse_length = fuse_length
         
     def calc_lift(self):
         self.CL = self.airfoil["cl"]
@@ -51,15 +55,18 @@ class Plane:
         self.wingspan = np.ceil(self.wingspan)
         self.chord_length = np.ceil(self.chord_length)
     
-    def change_velocity(self):
+    def cal_max_velocity(self):
         D = self.calc_drag()
-        while D < self.motor:
+        while D < self.motor: # if thrust from the motor is greater drag at velocity 'x'
             self.cruise_velocity = self.cruise_velocity * 1.01
             D = self.calc_drag()
 
         while self.motor < D:
             self.cruise_velocity = self.cruise_velocity * 0.99
             D = self.calc_drag()
+            
+    def decrease_velocity(self):
+        pass
 
         return self.cruise_velocity
             
@@ -76,12 +83,12 @@ class Plane:
         print("weight: " + str(self.weight))
         if self.priority == "Lift":
             self.change_lift()
-            self.change_velocity()
+            self.cal_max_velocity()
             self.change_drag()
             
-        if self.priority == "Speed":
-            self.change_velocity()
+        if self.priority == "High Speed":
+            self.cal_max_velocity()
             
         if self.priority == "Range":
-            self.decrease_drag()
+            self.change_drag()
             

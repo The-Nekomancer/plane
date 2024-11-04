@@ -10,12 +10,15 @@
 "wingspan"= 100
 "wing_mount_diam"= 3
 "tail_elevation"= 1.0
-"tail_chord_length"= 3
+"tail_chord_length"= 2.0442750478820733
 "nose_cone_length"= 12.5
 "nose_cone_splinex"= 9.5
 "nose_cone_spliney"= 2.4
 "wing_chord_length"= 5
 "tri_length"= 1.5
 "tri_degrees"= 45
+"tail_offset"= 2
+"vtail_length"= 33.5
+"fillet_rad"= 0.1
 "tail_connect_top"= 2.25
 "tail_connect_bottom"= 2.384848003542364
