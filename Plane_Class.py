@@ -54,6 +54,10 @@ class Plane:
         self.vtail_length = self.tail_length - 0.2
         
         
+        """
+        CALCULATION METHODS
+        """
+        #########CALCULATION METHODS###########################################
     def calc_fuse_size(self):    
         self.fuse_diam = 2 * self.payload_skid_width / np.sqrt(2)
         
@@ -74,7 +78,7 @@ class Plane:
         
     def calc_range(self):
         self.calc_endurance()
-        self.cal_velocity()
+        self.calc_velocity()
         self.range = self.endurance * self.cruise_velocity * 60**2
     
     def calc_lift(self):
@@ -86,16 +90,7 @@ class Plane:
         self.CD = self.airfoil["cd"]
         self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.2) * self.wingspan * self.chord_length)/9.81
     
-    def change_lift(self):
-        self.calc_lift()
-        while self.weight > self.lift:
-            self.wingspan = self.wingspan * 1.01
-            self.chord_length = self.chord_length * 1.01
-            self.calc_lift()
-        self.wingspan = np.ceil(self.wingspan)
-        self.chord_length = np.ceil(self.chord_length)
-    
-    def cal_velocity(self):
+    def calc_velocity(self):
         self.calc_drag()
         while self.drag < self.motor["thrust"]: # if thrust from the motor is greater drag at velocity 'x'
             self.cruise_velocity = self.cruise_velocity * 1.01
@@ -105,30 +100,50 @@ class Plane:
             self.cruise_velocity = self.cruise_velocity * 0.99
             self.calc_drag()
             
-    def decrease_velocity(self):
-        pass
-
-        return self.cruise_velocity
+        """
+        SYSTEM DESIGN METHODS
+        """
+        #################SYSTEM DESIGN METHODS#################################
             
-    def change_drag(self):
-        L = self.calc_lift()
-        while self.weight < L:
-            self.wingspan = self.wingspan * 0.99
-            self.chord_length = self.chord_length * 0.99
-            L = self.calc_lift()
-        self.wingspan = np.ceil(self.wingspan)
-        self.chord_length = np.ceil(self.chord_length)
+   
     
-    def determine_wing_properties(self):
-        print("weight: " + str(self.weight))
-        if self.priority == "Lift":
-            self.change_lift()
-            self.cal_max_velocity()
-            self.change_drag()
+   
+    
+   
+    
+   
+    # def decrease_velocity(self):
+    #     pass
+
+    #     return self.cruise_velocity
             
-        if self.priority == "High Speed":
-            self.cal_max_velocity()
+    # def change_lift(self):
+    #     self.calc_lift()
+    #     while self.weight > self.lift:
+    #         self.wingspan = self.wingspan * 1.01
+    #         self.chord_length = self.chord_length * 1.01
+    #         self.calc_lift()
+    #     self.wingspan = np.ceil(self.wingspan)
+    #     self.chord_length = np.ceil(self.chord_length)
+    # def change_drag(self):
+    #     L = self.calc_lift()
+    #     while self.weight < L:
+    #         self.wingspan = self.wingspan * 0.99
+    #         self.chord_length = self.chord_length * 0.99
+    #         L = self.calc_lift()
+    #     self.wingspan = np.ceil(self.wingspan)
+    #     self.chord_length = np.ceil(self.chord_length)
+    
+    # def determine_wing_properties(self):
+    #     print("weight: " + str(self.weight))
+    #     if self.priority == "Lift":
+    #         self.change_lift()
+    #         self.cal_max_velocity()
+    #         self.change_drag()
             
-        if self.priority == "Range":
-            self.change_drag()
+    #     if self.priority == "High Speed":
+    #         self.cal_max_velocity()
+            
+    #     if self.priority == "Range":
+    #         self.change_drag()
             

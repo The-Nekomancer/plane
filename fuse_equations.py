@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import math
 
 def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan):
