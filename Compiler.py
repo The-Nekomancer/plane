@@ -7,14 +7,15 @@ import fuse_equations
 
 obj = Plane(payload_mass = 3.5, priority = "Lift")
 
-
-obj.calc_fuse_size()
 obj.calc_mass()
 obj.calc_endurance()
 obj.calc_range()
 obj.calc_lift()
 obj.calc_drag()
 obj.calc_velocity()
+obj.fusealge_sizing()
+obj.motor_sizing()
+obj.wing_sizing()
 
 
 
