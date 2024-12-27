@@ -23,14 +23,14 @@ class Plane:
     motors = ([v602_kv180_50p, v602_kv180_70p, V10L_KV170_50p, V10L_KV170_70p])
     bat_8000_6s = {"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     
-    priority = {"Lift", "High Speed", "Range", "Low Speed"}
+    # priority = {"Low Speed", "High Speed", "Range", "Lift", "Endurance"}
+    priority = [1,2,3,4,5]
     def __init__(self, name = "test plane",
-                 wingspan = 2.540, 
-                 chord_length = .127,
+                 wingspan = 2.540,
                  airfoil = naca_2412,
                  payload_mass = 4,
                  cruise_velocity = 15.24,
-                 priority = "Lift",
+                 priority = priority[0],
                  motor = motors[0],
                  fuse_diam = .254,
                  fuse_length = .635,
@@ -41,7 +41,7 @@ class Plane:
                  vtail_chord = 0.04):
         self.name = name
         self.wingspan = wingspan
-        self.chord_length = chord_length
+        self.chord_length = wingspan/9
         self.airfoil = airfoil
         self.payload_mass = payload_mass
         self.cruise_velocity =  cruise_velocity
@@ -57,7 +57,11 @@ class Plane:
         self.tail_length = fuse_length + .2
         self.vtail_length = self.tail_length - 0.2
         self.vtail_chord = vtail_chord
-        
+        self.max_vel = 14
+        self.max_wingspan = 3
+        self.min_wingspan = 1
+        self.max_chord = self.wingspan/12
+        self.min_chord = self.wingspan/3
         
         """
         CALCULATION METHODS
@@ -104,7 +108,7 @@ class Plane:
         self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * self.airfoil["CLmax"] * self.wingspan * self.chord_length))
         self.calc_drag()
         while self.drag < self.motor["thrust"]: # if thrust from the motor is greater drag at velocity 'x'
-            self.cruise_velocity = self.cruise_velocity * 1.01
+            self.cruise_velocity = self.cruise_velocity * 1.001
             self.calc_drag()
                 
         """
@@ -143,15 +147,23 @@ class Plane:
         Plane.calc_mass(self)
         Plane.calc_velocity(self)
         self.weight = self.mass * 1 #lift is calculated in kg
-        while self.weight < self.lift:
-            self.wingspan = self.wingspan * 0.99
-            self.chord_length = self.chord_length * 0.99
-            Plane.calc_lift(self)
-        
-        while self.lift < self.weight:
-            self.wingspan = self.wingspan * 1.01
-            self.chord_length = self.chord_length * 1.01
-            Plane.calc_lift(self)
+        if self.priority == 2:
+            while self.weight < self.lift:
+                if self.wingspan < self.min_wingspan:
+                    break
+                else:
+                    self.wingspan = self.wingspan * 0.999
+                    self.chord_length = self.chord_length * 0.999
+                    Plane.calc_lift(self)
+        if self.priority == 1:
+            while self.cruise_velocity > self.max_vel:
+                if self.max_wingspan < self.wingspan:
+                    break
+                else:
+                    self.wingspan = self.wingspan * 1.001
+                    self.chord_length = self.chord_length * 1.001
+                    Plane.calc_lift(self)
+                    Plane.calc_velocity(self)
     
     def tail_sizing(self):
         Plane.calc_lift(self)
@@ -160,3 +172,9 @@ class Plane:
             self.tail_length = self.tail_length * 1.01
             Plane.calc_vtail_lift(self)
             
+    def vel_setting(self):
+        if self.priority == 1:
+            while self.mass < self.lift:
+                self.cruise_velocity = self.cruise_velocity * 0.99
+                Plane.calc_lift(self)
+                
