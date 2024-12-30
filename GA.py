@@ -6,21 +6,29 @@ Created on Fri Dec 27 13:56:06 2024
 """
 
 from Plane_Class import Plane
+import numpy as np
 import random as r
 import matplotlib.pyplot as plt
 
 '''Initial Population Creation'''
 record = []
 objects = []
-pop = 10
+pure = []
+all_mutants = []
+mutants_list = []
+pop = 50
+iteration_limit = 200
+keep = 5
+mutation_rate = 5
 for i in range(pop):
     obj = Plane(wingspan=r.uniform(1,3),batteries=r.randint(1, 4),motor=Plane.motors[r.randint(0, 3)])
     objects.append(obj)
+    pure.append(obj)
+    record.append(obj)
 
 e = 1
-while e < 5:     
+while e < iteration_limit:     
     for g in range(pop):
-        # obj = Plane(wingspan=r.uniform(1,3),batteries=r.randint(1, 4),motor=Plane.motors[r.randint(0, 3)])
         objects[g].calc_mass()
         objects[g].calc_endurance()
         objects[g].calc_range()
@@ -29,33 +37,43 @@ while e < 5:
         objects[g].calc_drag()
         objects[g].calc_velocity()
         # objects.append(obj)
-        record.append(objects[g])
+        # record.append(objects[g])
+        # pure.append(objects[g])
         
     '''Evaluation'''
     total_mass = 0
     total_wingspan = 0
     total_vel = 0
+    total_end = 0
+    total_range = 0
     mass_score  = []
     wingspan_score = []
     vel_score = []
+    end_score = []
+    range_score = []
     for j in range(pop):
         total_mass = total_mass + (objects[j].mass)
         total_wingspan = total_wingspan + (objects[j].wingspan)
         total_vel = total_vel + objects[j].cruise_velocity
+        total_end = total_end + objects[j].endurance
+        total_range = total_range + objects[j].range  
     for u in range(pop):
         mass_score.append(objects[u].mass/total_mass)
         wingspan_score.append(objects[u].wingspan/total_wingspan)
         vel_score.append(objects[u].cruise_velocity/total_vel)
+        end_score.append(objects[u].endurance/total_end)
+        range_score.append(objects[u].range/total_range)
             
     '''Fitness Function'''
     #Weighted fitness function, allows for the user to specify priorities
     #This is in contrast to prioritizing a single metric and moving the rest to constraints
     score = []
     for k in range(pop):
-        score.append((1)*mass_score[k] + (10)*vel_score[k] + (3)*wingspan_score[k])
+        score.append((4)*(1-mass_score[k]) + (10)*(1-vel_score[k]) + (3)*(1-wingspan_score[k]) + (6)*end_score[k] + (3)*range_score[k])
         
     '''Selection'''
     average_score = sum(score)/pop
+    score_to_beat = np.linspace(min(score), max(score), pop)
     keepers = []
     #Keeping indivisual sizes for later use
     wings = []
@@ -63,7 +81,8 @@ while e < 5:
     motors = []
     
     for n in range(pop):
-        if score[n] < average_score:
+        # if score[n] < average_score:
+        if score[n] >= score_to_beat[pop - keep]:
             keepers.append(objects[n])
             
     for h in range(len(keepers)):
@@ -85,16 +104,18 @@ while e < 5:
     
     '''Mutation'''
     mutants = []
-    for u in range(len(crossover)):
-        if r.randint(1, 10) > 8:
-            crossover[u].wingspan = r.uniform(1, 3)
-            crossover[u].batteries = r.randint(1, 4)
-            crossover[u].motor = keepers[r.randint(0, len(keepers)-1)].motor
-            mutants.append(crossover[u])
-            record.append(obj)
+    for u in range(len(objects)):
+        if r.uniform(0, 100) > (100 - mutation_rate):
+            objects[u].wingspan = r.uniform(1, 3)
+            objects[u].batteries = r.randint(1, 4)
+            objects[u].motor = keepers[r.randint(0, len(keepers)-1)].motor
+            mutants.append(objects[u])
+            record.append(objects[u])
+            all_mutants.append(objects[u])
+            mutants_list.append(len(record) -1)
 
-    for y in range(len(mutants)):
-        objects.append(mutants[y])
+    # for y in range(len(mutants)):
+        # objects.append(mutants[y])
     
     '''Population Replacement'''
     while len(objects) < len(range(pop)):
@@ -104,27 +125,35 @@ while e < 5:
         obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor)
         objects.append(obj)
         record.append(obj)
+        pure.append(obj)
         
     '''Additional Calculations'''
-    # for w in range(len(objects)):
-    #     objects[w].calc_mass()
-    #     objects[w].calc_endurance()
-    #     objects[w].calc_range()
-    #     objects[w].calc_lift()
-    #     objects[w].calc_vtail_lift()
-    #     objects[w].calc_drag()
-    #     objects[w].calc_velocity()
+    for w in range(len(objects)):
+        objects[w].calc_mass()
+        objects[w].calc_endurance()
+        objects[w].calc_range()
+        objects[w].calc_lift()
+        objects[w].calc_vtail_lift()
+        objects[w].calc_drag()
+        objects[w].calc_velocity()
         
     e = e + 1
 
 '''Plotting'''
 all_wingspans = []
+pure_wing = []
+mutant_wing = []
 all_mass = []
 all_vel = []
 all_endur = []
 all_range = []
 for f in range(len(record)):
     all_wingspans.append(record[f].wingspan)
+for x in range(len(pure)):
+    pure_wing.append(pure[x].wingspan)
+for z in range(len(all_mutants)):
+    mutant_wing.append(all_mutants[z].wingspan)
 
-plt.scatter(range(len(all_wingspans)),all_wingspans)
+plt.scatter(range(len(record)),all_wingspans, marker = ".")
+plt.scatter(mutants_list ,mutant_wing, marker = ".")
 plt.show()
