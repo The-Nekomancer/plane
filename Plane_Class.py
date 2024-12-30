@@ -76,7 +76,7 @@ class Plane:
         self.wing_mass = self.wingspan * self.chord_length * 2 *.2
         self.tail_mass = 0.004 * 3 * self.tail_length * .2
         self.vtail_mass = 2 * self.vtail_length * 0.2
-        self.mass = bat_skid_mass + self.payload_mass + self.motor["mass"] + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass
+        self.mass = bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass
         
     def calc_endurance(self):
         self.capacity = self.bat["capacity"] * self.batteries / 1000
