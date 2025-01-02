@@ -16,8 +16,8 @@ objects = []
 pure = []
 all_mutants = []
 mutants_list = []
-pop = 50
-iteration_limit = 200
+pop = 100
+iteration_limit = 50
 keep = 5
 mutation_rate = 5
 for i in range(pop):
@@ -157,3 +157,15 @@ for z in range(len(all_mutants)):
 plt.scatter(range(len(record)),all_wingspans, marker = ".")
 plt.scatter(mutants_list ,mutant_wing, marker = ".")
 plt.show()
+
+final_wing = np.mean(keepers[-1].wingspan)
+final_bat = pure[-1].bat
+final_motor = pure[-1].motor
+final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor)
+final.calc_mass()
+final.calc_endurance()
+final.calc_range()
+final.calc_lift()
+final.calc_vtail_lift()
+final.calc_drag()
+final.calc_velocity()
