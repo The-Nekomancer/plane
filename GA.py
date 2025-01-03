@@ -17,9 +17,9 @@ pure = []
 all_mutants = []
 mutants_list = []
 pop = 100
-iteration_limit = 50
+iteration_limit = 100
 keep = 5
-mutation_rate = 5
+mutation_rate = 2
 for i in range(pop):
     obj = Plane(wingspan=r.uniform(1,3),batteries=r.randint(1, 4),motor=Plane.motors[r.randint(0, 3)])
     objects.append(obj)
@@ -102,21 +102,6 @@ while e < iteration_limit:
         crossover.append(obj)
         objects.append(obj)
     
-    '''Mutation'''
-    mutants = []
-    for u in range(len(objects)):
-        if r.uniform(0, 100) > (100 - mutation_rate):
-            objects[u].wingspan = r.uniform(1, 3)
-            objects[u].batteries = r.randint(1, 4)
-            objects[u].motor = keepers[r.randint(0, len(keepers)-1)].motor
-            mutants.append(objects[u])
-            record.append(objects[u])
-            all_mutants.append(objects[u])
-            mutants_list.append(len(record) -1)
-
-    # for y in range(len(mutants)):
-        # objects.append(mutants[y])
-    
     '''Population Replacement'''
     while len(objects) < len(range(pop)):
         wingspan = r.uniform(min(wings)*1, max(wings)*1)
@@ -126,6 +111,18 @@ while e < iteration_limit:
         objects.append(obj)
         record.append(obj)
         pure.append(obj)
+     
+    '''Mutation'''
+    mutants = []
+    for u in range(len(objects)):
+        if r.uniform(0, 100) >= (100 - mutation_rate):
+            objects[u].wingspan = r.uniform(1, 3)
+            objects[u].batteries = r.randint(1, 4)
+            objects[u].motor = keepers[r.randint(0, len(keepers)-1)].motor
+            mutants.append(objects[u])
+            # record.append(objects[u])
+            all_mutants.append(objects[u])
+            mutants_list.append(len(record) - len(objects) + u -1)
         
     '''Additional Calculations'''
     for w in range(len(objects)):
@@ -141,25 +138,104 @@ while e < iteration_limit:
 
 '''Plotting'''
 all_wingspans = []
-pure_wing = []
-mutant_wing = []
-all_mass = []
-all_vel = []
-all_endur = []
+all_end = []
 all_range = []
+all_mass = []
+all_lift = []
+all_vel = []
+all_stall_speed = []
+
+pure_wing = []
+
+mutant_wing = []
+mutant_end = []
+mutant_range = []
+mutant_mass = []
+mutant_lift = []
+mutant_vel = []
+mutant_stall_speed = []
+
 for f in range(len(record)):
     all_wingspans.append(record[f].wingspan)
+    all_end.append(record[f].endurance)
+    all_range.append(record[f].range/1000)
+    all_mass.append(record[f].mass)
+    all_lift.append(record[f].lift)
+    all_vel.append(record[f].cruise_velocity)
+    all_stall_speed.append(record[f].stall_speed)
 for x in range(len(pure)):
     pure_wing.append(pure[x].wingspan)
 for z in range(len(all_mutants)):
     mutant_wing.append(all_mutants[z].wingspan)
+    mutant_end.append(all_mutants[z].endurance)
+    mutant_range.append(all_mutants[z].range/1000)
+    mutant_mass.append(all_mutants[z].mass)
+    mutant_lift.append(all_mutants[z].lift)
+    mutant_vel.append(all_mutants[z].cruise_velocity)
+    mutant_stall_speed.append(all_mutants[z].stall_speed)
 
-plt.scatter(range(len(record)),all_wingspans, marker = ".")
-plt.scatter(mutants_list ,mutant_wing, marker = ".")
+'''wingspan'''
+fig = plt.figure(1)
+plt.scatter(range(len(record)),all_wingspans, marker = ".", label="Solutions")
+plt.scatter(mutants_list ,mutant_wing, marker = ".", label="Mutants")
+plt.legend()
+plt.title("Wingspan")
+plt.xlabel("Iteration Number")
+plt.ylabel("Meters")
+plt.show()
+
+'''velocity'''
+fig = plt.figure(2)
+plt.scatter(range(len(record)),all_vel, marker = ".", label="Solutions")
+plt.scatter(mutants_list ,mutant_vel, marker = ".", label="Mutants")
+plt.legend()
+plt.title("Cruise Velocity")
+plt.xlabel("Iteration Number")
+plt.ylabel("Meters/Second")
+plt.show()
+
+'''mass'''
+fig = plt.figure(3)
+plt.scatter(range(len(record)),all_mass, marker = ".", label="Solutions")
+plt.scatter(mutants_list ,mutant_mass, marker = ".", label="Mutants")
+plt.legend()
+plt.title("Mass")
+plt.xlabel("Iteration Number")
+plt.ylabel("Kg")
+plt.show()
+
+'''endurance'''
+fig = plt.figure(4)
+plt.scatter(range(len(record)),all_end, marker = ".", label="Solutions")
+plt.scatter(mutants_list ,mutant_end, marker = ".", label="Mutants")
+plt.legend()
+plt.title("Endurance")
+plt.xlabel("Iteration Number")
+plt.ylabel("Hours")
+plt.show()
+
+'''range'''
+fig = plt.figure(5)
+plt.scatter(range(len(record)),all_range, marker = ".", label="Solutions")
+plt.scatter(mutants_list ,mutant_range, marker = ".", label="Mutants")
+plt.legend()
+plt.title("Range")
+plt.xlabel("Iteration Number")
+plt.ylabel("Km")
+plt.show()
+
+'''lift'''
+fig = plt.figure(6)
+plt.scatter(range(len(record)),all_lift, marker = ".", label="Solutions")
+plt.scatter(mutants_list ,mutant_lift, marker = ".", label="Mutants")
+plt.legend()
+plt.title("Lift")
+plt.xlabel("Iteration Number")
+plt.ylabel("Kg (converted from N)")
 plt.show()
 
 final_wing = np.mean(keepers[-1].wingspan)
-final_bat = pure[-1].bat
+final_bat = pure[-1].batteries
 final_motor = pure[-1].motor
 final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor)
 final.calc_mass()
@@ -169,3 +245,14 @@ final.calc_lift()
 final.calc_vtail_lift()
 final.calc_drag()
 final.calc_velocity()
+
+'''plot'''
+fig = plt.figure(7)
+plt.scatter(all_end,all_range, marker = ".", label="Solutions")
+# plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
+plt.scatter(final.endurance, final.range/1000)
+plt.legend()
+plt.title("Range")
+plt.xlabel("Iteration Number")
+plt.ylabel("Km")
+plt.show()
