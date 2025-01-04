@@ -144,6 +144,8 @@ all_mass = []
 all_lift = []
 all_vel = []
 all_stall_speed = []
+all_drag = []
+all_ld = []
 
 pure_wing = []
 
@@ -163,6 +165,8 @@ for f in range(len(record)):
     all_lift.append(record[f].lift)
     all_vel.append(record[f].cruise_velocity)
     all_stall_speed.append(record[f].stall_speed)
+    all_drag.append(record[f].drag)
+    all_ld.append(record[f].lift/record[f].drag)
 for x in range(len(pure)):
     pure_wing.append(pure[x].wingspan)
 for z in range(len(all_mutants)):
@@ -250,9 +254,19 @@ final.calc_velocity()
 fig = plt.figure(7)
 plt.scatter(all_end,all_range, marker = ".", label="Solutions")
 # plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
-plt.scatter(final.endurance, final.range/1000)
+plt.scatter(final.endurance, final.range/1000, label="Final")
 plt.legend()
-plt.title("Range")
-plt.xlabel("Iteration Number")
-plt.ylabel("Km")
+plt.title("Performance Curve Comparison")
+plt.xlabel("Endurance (Hours)")
+plt.ylabel("Range (Km)")
+plt.show()
+
+fig = plt.figure(8)
+plt.scatter(all_drag,all_lift, marker = ".", label="Solutions")
+# plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
+plt.scatter(final.drag, final.lift, label="Final")
+plt.legend()
+plt.title("Performance Curve Comparison")
+plt.xlabel("Drag (Kg)")
+plt.ylabel("Lift (Kg)")
 plt.show()

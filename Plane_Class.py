@@ -5,11 +5,12 @@ Created on Mon Sep 23 16:57:00 2024
 @author: mjb7tf
 """
 import numpy as np
+import pandas as pd
 # All measurements are in inch, pounds, seconds
 
 class Plane:
     air_desnsity = 1.225 #kg per m cubed
-    
+    naca2412 = pd.read_csv('naca2412.csv')
     airfoils = (["naca_0012", "naca_2412"])
     naca_0012 = {"cl": -0.1034, "alpha": -1, "cd": 0.0064,"cm": -0.0032, "CLmax": 1.2363 }
     naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
@@ -38,7 +39,8 @@ class Plane:
                  batteries = 2,
                  payload_skid_width = .1,
                  payload_skid_length = .15,
-                 vtail_chord = 0.04):
+                 vtail_chord = 0.04,
+                 alpha = 5):
         self.name = name
         self.wingspan = wingspan
         self.chord_length = wingspan/9
@@ -62,6 +64,7 @@ class Plane:
         self.min_wingspan = 1
         self.max_chord = self.wingspan/12
         self.min_chord = self.wingspan/3
+        self.alpha = alpha
         
         """
         CALCULATION METHODS
@@ -89,7 +92,8 @@ class Plane:
         self.range = self.endurance * self.cruise_velocity * 60**2
     
     def calc_lift(self):
-        self.CL = self.airfoil["cl"]
+        # self.CL = self.airfoil["cl"]
+        self.CL = Plane.naca2412.loc[60 + 4*self.alpha, 'CL']
         self.lift = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * self.CL * self.wingspan * self.chord_length)/9.81
         # air density in kg/m3         (m/s)                     no unit       m                mm  convert to Kg
         self.moment = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * self.airfoil["cm"] * self.wingspan * self.chord_length)
@@ -100,7 +104,8 @@ class Plane:
         self.vtail_moment = self.vtail_lift * self.tail_length
     
     def calc_drag(self):
-        self.CD = self.airfoil["cd"]
+        # self.CD = self.airfoil["cd"]
+        self.CD = Plane.naca2412.loc[60 + 4*self.alpha, 'CD']
         self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.2) * self.wingspan * self.chord_length)/9.81
     
     def calc_velocity(self):
