@@ -62,8 +62,8 @@ class Plane:
         self.max_vel = 14
         self.max_wingspan = 3
         self.min_wingspan = 1
-        self.max_chord = self.wingspan/12
-        self.min_chord = self.wingspan/3
+        self.max_chord = self.wingspan/3
+        self.min_chord = self.wingspan/12
         self.alpha = alpha
         
         """
