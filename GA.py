@@ -149,6 +149,21 @@ def GA():
             objects[w].calc_vtail_lift()
             objects[w].calc_drag()
             objects[w].calc_velocity()
+          # if objects[w].lift >= objects[w].mass * 1.35:
+          #     i = r.randint(1,2)
+          #     if i == 1:
+          #         while objects[w].lift >= objects[w].mass * 1.35:
+          #             objects[w].wingspan = objects[w].wingspan * 0.99
+          #             objects[w].chord_length = objects[w].chord_length * 0.99
+          #             objects[w].calc_lift()
+          #     elif i == 2:
+          #         while objects[w].lift >= objects[w].mass * 1.35:
+          #             objects[w].alpha = objects[w].alpha - 0.25
+          #             objects[w].calc_lift()
+              # elif i == 3:
+              #     while objects[w].lift >= objects[w].mass * 1.05:
+              #         objects[w].cruise_velocity = objects[w].cruise_velocity * 0.99
+              #         objects[w].calc_lift()
             
         e = e + 1
     
