@@ -279,6 +279,10 @@ def GA():
     final_motor = pure[-1].motor
     final_alpha = pure[-1].alpha
     final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,alpha=final_alpha)
+    final.wingspan = round(final.wingspan,3)
+    final.chord_length = round(final.chord_length,3)
+    final.fuse_diam = round(final.fuse_diam,3)
+    final.fuse_length = round(final.fuse_length,3)
     final.calc_mass()
     final.calc_endurance()
     final.calc_range()
@@ -286,6 +290,8 @@ def GA():
     final.calc_vtail_lift()
     final.calc_drag()
     final.calc_velocity()
+
+
   # 
   # '''plot'''
   # fig = plt.figure(7)

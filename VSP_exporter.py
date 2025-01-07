@@ -14,19 +14,19 @@ vsp.VSPRenew()
 
 # Add a fuselage
 fuse_id = vsp.AddGeom("FUSELAGE")
-vsp.SetParmVal(fuse_id, "Length", "Design", final.fuse_length)
-vsp.SetParmVal(fuse_id, "Diameter", "Design", final.fuse_diam)
+vsp.SetParmVal(fuse_id, "Length", "Geom", final.fuse_length)
+vsp.SetParmVal(fuse_id, "Diameter", "Geom", final.fuse_diam)
 
 # Add a wing
 wing_id = vsp.AddGeom("WING")
-vsp.SetParmVal(wing_id, "Span", "Design", final.wingspan)
-vsp.SetParmVal(wing_id, "Root_Chord", "Design", final.chord_length)
-vsp.SetParmVal(wing_id, "Tip_Chord", "Design", final.chord_length)
+vsp.SetParmVal(wing_id, "Span", "Xsec", final.wingspan)
+vsp.SetParmVal(wing_id, "Root_Chord", "Xsec", final.chord_length)
+vsp.SetParmVal(wing_id, "Tip_Chord", "Xsec", final.chord_length)
 
 # Write the VSP file
 vsp.WriteVSPFile("genetic_alg.vsp3")
 
-print(final.lift)
-print(final.mass)
-print(final.cruise_velocity)
-print(final.wingspan)
+print("fuselage diameter: "  + str(final.fuse_diam))
+print("fuselage length: "  + str(final.fuse_length))
+print("chord length: "  + str(final.chord_length))
+print("Wingspan: "  + str(final.wingspan))
