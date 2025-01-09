@@ -2,7 +2,7 @@
 """
 Created on Fri Dec 27 13:56:06 2024
 
-@author: brigg
+@author: briggs
 """
 
 from Plane_Class import Plane
@@ -11,17 +11,22 @@ import random as r
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def GA(priority):
+def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
     '''Initial Population Creation'''
     record = []
     objects = []
     pure = []
     all_mutants = []
     mutants_list = []
-    pop = 100
-    iteration_limit = 100
-    keep = 5
-    mutation_rate = 2
+    #THESE VALUES WORK
+    #pop = 100
+    #iteration_limit = 100
+    #keep = 5
+    #mutation_rate = 2
+    pop = q1
+    iteration_limit = q2
+    keep = int(round(pop*q3,0))
+    mutation_rate = q4
     for i in range(pop):
         wing= r.uniform(1,3)
         batteries = r.randint(1, 4)
@@ -83,9 +88,9 @@ def GA(priority):
         score = []
         for k in range(pop):
             if priority == "low speed":
-                score.append((4)*(1-mass_score[k]) + (4)*(ld_score[k]) + (10)*(1-vel_score[k]) + (3)*(1-wingspan_score[k]) + (6)*end_score[k] + (3)*range_score[k])
+                score.append((A)*(1-mass_score[k]) + (B)*(ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*end_score[k] + (F)*range_score[k])
             elif priority == "high speed":
-                score.append((1)*(1-mass_score[k]) + (1)*(ld_score[k]) + (10)*(vel_score[k]) + (1)*(1-wingspan_score[k]) + (1)*end_score[k] + (1)*range_score[k])
+                score.append((A)*(1-mass_score[k]) + (B)*(ld_score[k]) + (C)*(vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*end_score[k] + (F)*range_score[k])
             
         '''Selection'''
         average_score = sum(score)/pop
@@ -224,66 +229,6 @@ def GA(priority):
         mutant_vel.append(all_mutants[z].cruise_velocity)
         mutant_stall_speed.append(all_mutants[z].stall_speed)
     
-    #'''wingspan'''
-    #fig = plt.figure(1)
-    #plt.scatter(range(len(record)),all_wingspans, marker = ".", label="Solutions")
-    #plt.scatter(mutants_list ,mutant_wing, marker = ".", label="Mutants")
-    #plt.legend()
-    #plt.title("Wingspan")
-    #plt.xlabel("Iteration Number")
-    #plt.ylabel("Meters")
-    #plt.show()
-    #
-    #'''velocity'''
-    #fig = plt.figure(2)
-    #plt.scatter(range(len(record)),all_vel, marker = ".", label="Solutions")
-    #plt.scatter(mutants_list ,mutant_vel, marker = ".", label="Mutants")
-    #plt.legend()
-    #plt.title("Cruise Velocity")
-    #plt.xlabel("Iteration Number")
-    #plt.ylabel("Meters/Second")
-    #plt.show()
-    #
-    #'''mass'''
-    #fig = plt.figure(3)
-    #plt.scatter(range(len(record)),all_mass, marker = ".", label="Solutions")
-    #plt.scatter(mutants_list ,mutant_mass, marker = ".", label="Mutants")
-    #plt.legend()
-    #plt.title("Mass")
-    #plt.xlabel("Iteration Number")
-    #plt.ylabel("Kg")
-    #plt.show()
-    #
-    #'''endurance'''
-    #fig = plt.figure(4)
-    #plt.scatter(range(len(record)),all_end, marker = ".", label="Solutions")
-    #plt.scatter(mutants_list ,mutant_end, marker = ".", label="Mutants")
-    #plt.legend()
-    #plt.title("Endurance")
-    #plt.xlabel("Iteration Number")
-    #plt.ylabel("Hours")
-    #plt.show()
-    #
-    #'''range'''
-    #fig = plt.figure(5)
-    #plt.scatter(range(len(record)),all_range, marker = ".", label="Solutions")
-    #plt.scatter(mutants_list ,mutant_range, marker = ".", label="Mutants")
-    #plt.legend()
-    #plt.title("Range")
-    #plt.xlabel("Iteration Number")
-    #plt.ylabel("Km")
-    #plt.show()
-    #
-    #'''lift'''
-    #fig = plt.figure(6)
-    #plt.scatter(range(len(record)),all_lift, marker = ".", label="Solutions")
-    #plt.scatter(mutants_list ,mutant_lift, marker = ".", label="Mutants")
-    #plt.legend()
-    #plt.title("Lift")
-    #plt.xlabel("Iteration Number")
-    #plt.ylabel("Kg (converted from N)")
-    #plt.show()
-    #
     final_wing = np.mean(keepers[-1].wingspan)
     final_bat = pure[-1].batteries
     final_motor = pure[-1].motor
@@ -300,41 +245,94 @@ def GA(priority):
     final.calc_vtail_lift()
     final.calc_drag()
     final.calc_velocity()
-
-
-    # 
-    '''plot'''
-    #fig = plt.figure(7)
-    #plt.scatter(all_end,all_range, marker = ".", label="Solutions")
-    ## plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
-    #plt.scatter(final.endurance, final.range/1000, label="Final")
-    #plt.legend()
-    #plt.title("Performance Curve Comparison")
-    #plt.xlabel("Endurance (Hours)")
-    #plt.ylabel("Range (Km)")
-    #plt.show()
-    #
-    #fig = plt.figure(8)
-    #plt.scatter(all_drag,all_lift, marker = ".", label="Solutions")
-    ## plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
-    #plt.scatter(final.drag, final.lift, label="Final")
-    #plt.legend()
-    #plt.title("Performance Curve Comparison")
-    #plt.xlabel("Drag (Kg)")
-    #plt.ylabel("Lift (Kg)")
-    #plt.show()
-    #
-    #fig = plt.figure(9)
-    #plt.subplot(2, 1,1)
-    #plt.scatter(Plane.naca2412['Alpha'],Plane.naca2412['CL'], marker = ".", label="CL")
-    #plt.ylabel("CL")
-    #plt.subplot(2, 1,2)
-    #plt.scatter(Plane.naca2412['Alpha'],Plane.naca2412['CD'], marker='.',label="CD")
-    ## plt.scatter(Plane.naca2412['Alpha'],(Plane.naca2412['CL']/Plane.naca2412['CD']), marker='.',label="L/D")
-    ## plt.legend()
-    #plt.title("CD and CL w/ respect to alpha")
-    #plt.xlabel("Alpha")
-    #plt.ylabel("CD")
-    #plt.show()
-    ## 
+        
+    if plots == 1:
+        '''wingspan'''
+        fig = plt.figure(1)
+        plt.scatter(range(len(record)),all_wingspans, marker = ".", label="Solutions")
+        plt.scatter(mutants_list ,mutant_wing, marker = ".", label="Mutants")
+        plt.legend()
+        plt.title("Wingspan")
+        plt.xlabel("Iteration Number")
+        plt.ylabel("Meters")
+        plt.show()
+        '''velocity'''
+        fig = plt.figure(2)
+        plt.scatter(range(len(record)),all_vel, marker = ".", label="Solutions")
+        plt.scatter(mutants_list ,mutant_vel, marker = ".", label="Mutants")
+        plt.legend()
+        plt.title("Cruise Velocity")
+        plt.xlabel("Iteration Number")
+        plt.ylabel("Meters/Second")
+        plt.show()
+        '''mass'''
+        fig = plt.figure(3)
+        plt.scatter(range(len(record)),all_mass, marker = ".", label="Solutions")
+        plt.scatter(mutants_list ,mutant_mass, marker = ".", label="Mutants")
+        plt.legend()
+        plt.title("Mass")
+        plt.xlabel("Iteration Number")
+        plt.ylabel("Kg")
+        plt.show()
+        '''endurance'''
+        fig = plt.figure(4)
+        plt.scatter(range(len(record)),all_end, marker = ".", label="Solutions")
+        plt.scatter(mutants_list ,mutant_end, marker = ".", label="Mutants")
+        plt.legend()
+        plt.title("Endurance")
+        plt.xlabel("Iteration Number")
+        plt.ylabel("Hours")
+        plt.show()
+        '''range'''
+        fig = plt.figure(5)
+        plt.scatter(range(len(record)),all_range, marker = ".", label="Solutions")
+        plt.scatter(mutants_list ,mutant_range, marker = ".", label="Mutants")
+        plt.legend()
+        plt.title("Range")
+        plt.xlabel("Iteration Number")
+        plt.ylabel("Km")
+        plt.show()
+        '''lift'''
+        fig = plt.figure(6)
+        plt.scatter(range(len(record)),all_lift, marker = ".", label="Solutions")
+        plt.scatter(mutants_list ,mutant_lift, marker = ".", label="Mutants")
+        plt.legend()
+        plt.title("Lift")
+        plt.xlabel("Iteration Number")
+        plt.ylabel("Kg (converted from N)")
+        plt.show()
+        '''Endurance and Range'''
+        fig = plt.figure(7)
+        plt.scatter(all_end,all_range, marker = ".", label="Solutions")
+        # plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
+        plt.scatter(final.endurance, final.range/1000, label="Final")
+        plt.legend()
+        plt.title("Performance Curve Comparison")
+        plt.xlabel("Endurance (Hours)")
+        plt.ylabel("Range (Km)")
+        plt.show()
+        '''L over D'''
+        fig = plt.figure(8)
+        plt.scatter(all_drag,all_lift, marker = ".", label="Solutions")
+        # plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
+        plt.scatter(final.drag, final.lift, label="Final")
+        plt.legend()
+        plt.title("Performance Curve Comparison")
+        plt.xlabel("Drag (Kg)")
+        plt.ylabel("Lift (Kg)")
+        plt.show()
+        '''CL and CD over alpha'''
+        fig = plt.figure(9)
+        plt.subplot(2, 1,1)
+        plt.scatter(Plane.naca2412['Alpha'],Plane.naca2412['CL'], marker = ".", label="CL")
+        plt.ylabel("CL")
+        plt.title("CD and CL w/ respect to alpha")
+        plt.subplot(2, 1,2)
+        plt.scatter(Plane.naca2412['Alpha'],Plane.naca2412['CD'], marker='.',label="CD")
+        # plt.scatter(Plane.naca2412['Alpha'],(Plane.naca2412['CL']/Plane.naca2412['CD']), marker='.',label="L/D")
+        # plt.legend()
+        plt.xlabel("Alpha")
+        plt.ylabel("CD")
+        plt.show()
+        # 
     return final
