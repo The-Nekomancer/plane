@@ -5,28 +5,44 @@ Created on Mon Jan  6 09:38:38 2025
 @author: brigg
 """
 
-#import openvsp as vsp
+import openvsp as vsp
 from GA import GA
 priority = "low speed"
 #priority = "high speed"
 final = GA(priority)
-## Create a new VSP model
-#vsp.VSPRenew()
-#
-## Add a fuselage
-#fuse_id = vsp.AddGeom("FUSELAGE")
-#vsp.SetParmVal(fuse_id, "Length", "Geom", final.fuse_length)
-#vsp.SetParmVal(fuse_id, "Diameter", "Geom", final.fuse_diam)
-#
-## Add a wing
-#wing_id = vsp.AddGeom("WING")
-#vsp.SetParmVal(wing_id, "Span", "Xsec", final.wingspan)
-#vsp.SetParmVal(wing_id, "Root_Chord", "Xsec", final.chord_length)
-#vsp.SetParmVal(wing_id, "Tip_Chord", "Xsec", final.chord_length)
-#
-## Write the VSP file
-#vsp.WriteVSPFile("genetic_alg.vsp3")
+# Create a new VSP model
+vsp.VSPRenew()
 
+'''Fuselage'''
+fuseid = vsp.AddGeom( "FUSELAGE", "" )
+xsec_surf = vsp.GetXSecSurf( fuseid, 0 )
+sections = range(1,vsp.GetNumXSec( xsec_surf )-1)
+for x in sections:
+    vsp.ChangeXSecShape( xsec_surf, x, vsp.XS_CIRCLE )
+    xsec = vsp.GetXSec( xsec_surf, x)
+    wid = vsp.GetXSecParm( xsec, "Circle_Diameter" )
+    vsp.SetParmVal( wid, final.fuse_diam )
+vsp.SetParmVal( fuseid, "Length", "Design", final.fuse_length )
+
+'''Wing'''
+wid = vsp.AddGeom( "WING", "" )
+vsp.InsertXSec( wid, 1, vsp.XS_FOUR_SERIES )
+vsp.SetParmVal(wid, "X_Rel_Location", "XForm", final.fuse_length/2 - final.chord_length/2)
+vsp.SetParmVal(wid, "Z_Rel_Location", "XForm", final.fuse_diam/2)
+vsp.CutXSec( wid, 1 )
+vsp.SetDriverGroup( wid, 1, vsp.AREA_WSECT_DRIVER, vsp.ROOTC_WSECT_DRIVER, vsp.TIPC_WSECT_DRIVER )
+vsp.SetParmVal( wid, "Root_Chord", "XSec_1", final.chord_length )
+vsp.SetParmVal( wid, "Tip_Chord", "XSec_1", final.chord_length )
+vsp.SetParmVal( wid, "Sweep", "XSec_1", 0)
+vsp.SetParmVal( wid, "Span", "XSec_1", final.wingspan )
+
+'''Airfoil'''
+vsp.SetParmVal( wid, "Camber", "XSecCurve_0", 0.02 )
+vsp.SetParmVal( wid, "CamberLoc", "XSecCurve_0", 0.4 )
+vsp.SetParmVal( wid, "ThickChord", "XSecCurve_0", 0.12 )
+vsp.Update()
+
+vsp.WriteVSPFile("genetic_alg.vsp3")
 print("fuselage diameter: "  + str(final.fuse_diam))
 print("fuselage length: "  + str(final.fuse_length))
 print("chord length: "  + str(final.chord_length))

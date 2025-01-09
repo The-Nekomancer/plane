@@ -17,13 +17,7 @@ class Plane:
     naca_0012 = {"cl": -0.1034, "alpha": -1, "cd": 0.0064,"cm": -0.0032, "CLmax": 1.2363 }
     naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
     
-    #v602_kv180_50p = {"name": "v602_kv180_50p", "mass": 0.345, "thrust": 3.527, "amps": 8.77, "efficiency": 8.45, "prop length": 22}
-    #v602_kv180_70p = {"name": "v602_kv180_70p", "mass": 0.345, "thrust": 5.737, "amps": 18.02, "efficiency": 6.73, "prop length": 22}
-    
-    #V10L_KV170_50p = {"name": "V10L_KV170_50p", "mass": 0.445, "thrust": 10.802, "amps": 37.81, "efficiency": 6.07, "prop length": 30}
-    #V10L_KV170_70p = {"name": "V10L_KV170_70p", "mass": 0.445, "thrust": 18.57, "amps": 82.55, "efficiency": 4.88, "prop length": 30}
     motors = ([v602_kv180, v10l_kv170])
-    #motors = ([v602_kv180_50p, v602_kv180_70p, V10L_KV170_50p, V10L_KV170_70p])
     bat_8000_6s = {"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     
     # priority = {"Low Speed", "High Speed", "Range", "Lift", "Endurance"}
