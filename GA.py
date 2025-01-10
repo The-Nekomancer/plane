@@ -11,13 +11,14 @@ import random as r
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
+def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj):
     '''Initial Population Creation'''
     record = []
     objects = []
     pure = []
     all_mutants = []
     mutants_list = []
+    keepers_score = []
     #THESE VALUES WORK
     #pop = 100
     #iteration_limit = 100
@@ -38,7 +39,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
         objects.append(obj)
         pure.append(obj)
         record.append(obj)
-    
+
     e = 1
     while e < iteration_limit:     
         for g in range(pop):
@@ -52,7 +53,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
             # objects.append(obj)
             # record.append(objects[g])
             # pure.append(objects[g])
-            
+
         '''Evaluation'''
         total_mass = 0
         total_wingspan = 0
@@ -66,7 +67,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
         end_score = []
         range_score = []
         ld_score = []
-        
+
         for j in range(pop):
             total_mass = total_mass + (objects[j].mass)
             total_wingspan = total_wingspan + (objects[j].wingspan)
@@ -75,23 +76,29 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
             total_range = total_range + objects[j].range
             total_ld = total_ld + (objects[j].lift/objects[j].drag)
         for u in range(pop):
-            mass_score.append(objects[u].mass/total_mass)
-            wingspan_score.append(objects[u].wingspan/total_wingspan)
-            vel_score.append(objects[u].cruise_velocity/total_vel)
-            end_score.append(objects[u].endurance/total_end)
-            range_score.append(objects[u].range/total_range)
-            ld_score.append((objects[u].CL/objects[u].CD)/total_ld)
-                
+            #mass_score.append(objects[u].mass/total_mass)
+            #wingspan_score.append(objects[u].wingspan/total_wingspan)
+            #vel_score.append(objects[u].cruise_velocity/total_vel)
+            #end_score.append(objects[u].endurance/total_end)
+            #range_score.append(objects[u].range/total_range)
+            #ld_score.append((objects[u].CL/objects[u].CD)/total_ld)
+            mass_score.append(abs(mass_obj - objects[u].mass)/mass_obj)
+            ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
+            vel_score.append(abs(vel_obj - objects[u].cruise_velocity)/vel_obj)
+            wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)
+            end_score.append(abs(end_obj - objects[u].endurance)/end_obj)
+            range_score.append(abs(range_obj - objects[u].range)/range_obj)
+
         '''Fitness Function'''
         #Weighted fitness function, allows for the user to specify priorities
         #This is in contrast to prioritizing a single metric and moving the rest to constraints
         score = []
         for k in range(pop):
             if priority == "low speed":
-                score.append((A)*(1-mass_score[k]) + (B)*(ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*end_score[k] + (F)*range_score[k])
+                score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
             elif priority == "high speed":
-                score.append((A)*(1-mass_score[k]) + (B)*(ld_score[k]) + (C)*(vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*end_score[k] + (F)*range_score[k])
-            
+                score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*end_score[k] + (F)*range_score[k])
+
         '''Selection'''
         average_score = sum(score)/pop
         score_to_beat = np.linspace(min(score), max(score), pop)
@@ -101,18 +108,19 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
         bat = []
         motors = []
         alfa = []
-        
+
         for n in range(pop):
             # if score[n] < average_score:
             if score[n] >= score_to_beat[pop - keep]:
                 keepers.append(objects[n])
-                
+                keepers_score.append(score[n])
+
         for h in range(len(keepers)):
             wings.append(keepers[h].wingspan)
             bat.append(keepers[h].batteries)
             motors.append(keepers[h].motor)
             alfa.append(keepers[h].alpha)
-    
+
         '''Crossover'''
         #Uniform crossover pattern, each chromasom is crossed over
         objects = []
@@ -125,21 +133,21 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
             obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,alpha=alpha)
             crossover.append(obj)
             objects.append(obj)
-        
+
         '''Population Replacement'''
         while len(objects) < len(range(pop)):
             wingspan = r.uniform(min(wings)*1, max(wings)*1)
             batteries = r.randint(min(bat), max(bat))
-            motor_num = r.randint(0, len(keepers)-1)
-            motor = keepers[motor_num].motor
-            motor_num = keepers[motor_num].motor_num
+            moto_sel = keepers[r.randint(0, len(keepers)-1)].motor_num
+            motor_num = keepers[moto_sel].motor_num
+            motor = keepers[moto_sel].motor
             alpha = keepers[r.randint(0, len(keepers)-1)].alpha
             throttle = keepers[r.randint(0, len(keepers)-1)].throttle
             obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num)
             objects.append(obj)
             record.append(obj)
             pure.append(obj)
-         
+
         '''Mutation'''
         mutants = []
         for u in range(len(objects)):
@@ -149,12 +157,13 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
                 objects[u].motor = keepers[r.randint(0, len(keepers)-1)].motor
                 objects[u].alpha = r.randint(0,40)/4
                 objects[u].throttle = r.randint(1,len(objects[u].motor)-1)
-                
+                #objects[u].throttle = 2
+
                 mutants.append(objects[u])
                 # record.append(objects[u])
                 all_mutants.append(objects[u])
                 mutants_list.append(len(record) - len(objects) + u -1)
-            
+
         '''Additional Calculations'''
         for w in range(len(objects)):
             objects[w].calc_mass()
@@ -179,9 +188,9 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
               #     while objects[w].lift >= objects[w].mass * 1.05:
               #         objects[w].cruise_velocity = objects[w].cruise_velocity * 0.99
               #         objects[w].calc_lift()
-            
+
         e = e + 1
-    
+
     '''Plotting'''
     all_wingspans = []
     all_end = []
@@ -194,9 +203,9 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
     all_ld = []
     all_cl = []
     all_cd = []
-    
+
     pure_wing = []
-    
+
     mutant_wing = []
     mutant_end = []
     mutant_range = []
@@ -204,11 +213,18 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
     mutant_lift = []
     mutant_vel = []
     mutant_stall_speed = []
-    
+
     for f in range(len(record)):
+        record[f].calc_mass()
+        record[f].calc_endurance()
+        record[f].calc_range()
+        record[f].calc_lift()
+        record[f].calc_vtail_lift()
+        record[f].calc_drag()
+        record[f].calc_velocity()
         all_wingspans.append(record[f].wingspan)
         all_end.append(record[f].endurance)
-        all_range.append(record[f].range/1000)
+        all_range.append(record[f].range)
         all_mass.append(record[f].mass)
         all_lift.append(record[f].lift)
         all_vel.append(record[f].cruise_velocity)
@@ -217,18 +233,18 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
         all_ld.append(record[f].lift/record[f].drag)
         all_cl.append(record[f].CL)
         all_cd.append(record[f].CD)
-        
+
     for x in range(len(pure)):
         pure_wing.append(pure[x].wingspan)
     for z in range(len(all_mutants)):
         mutant_wing.append(all_mutants[z].wingspan)
         mutant_end.append(all_mutants[z].endurance)
-        mutant_range.append(all_mutants[z].range/1000)
+        mutant_range.append(all_mutants[z].range)
         mutant_mass.append(all_mutants[z].mass)
         mutant_lift.append(all_mutants[z].lift)
         mutant_vel.append(all_mutants[z].cruise_velocity)
         mutant_stall_speed.append(all_mutants[z].stall_speed)
-    
+
     final_wing = np.mean(keepers[-1].wingspan)
     final_bat = pure[-1].batteries
     final_motor = pure[-1].motor
@@ -245,7 +261,14 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
     final.calc_vtail_lift()
     final.calc_drag()
     final.calc_velocity()
-        
+    mass_score = (abs(mass_obj - final.mass)/mass_obj)
+    ld_score = (abs(ld_obj - (final.CL/final.CD))/ld_obj)
+    vel_score = (abs(vel_obj - final.cruise_velocity)/vel_obj)
+    wingspan_score = (abs(wingspan_obj - final.wingspan)/wingspan_obj)
+    end_score = (abs(end_obj - final.endurance)/end_obj)
+    range_score = (abs(range_obj - final.range)/range_obj)
+    final.score = ((A)*(1-mass_score) + (B)*(1-ld_score) + (C)*(1-vel_score) + (D)*(1-wingspan_score) + (E)*(1-end_score) + (F)*(1-range_score))
+
     if plots == 1:
         '''wingspan'''
         fig = plt.figure(1)
@@ -305,7 +328,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
         fig = plt.figure(7)
         plt.scatter(all_end,all_range, marker = ".", label="Solutions")
         # plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
-        plt.scatter(final.endurance, final.range/1000, label="Final")
+        plt.scatter(final.endurance, final.range, label="Final")
         plt.legend()
         plt.title("Performance Curve Comparison")
         plt.xlabel("Endurance (Hours)")
@@ -334,5 +357,11 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4):
         plt.xlabel("Alpha")
         plt.ylabel("CD")
         plt.show()
-        # 
-    return final
+
+        fig = plt.figure(10)
+        plt.plot(range(len(keepers_score)), keepers_score)
+        plt.xlabel("Interations kept")
+        plt.ylabel("score")
+        plt.title("Scores over time")
+        plt.show()
+    return final, record, objects

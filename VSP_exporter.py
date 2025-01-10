@@ -5,30 +5,39 @@ Created on Mon Jan  6 09:38:38 2025
 @author: briggs
 """
 
-import openvsp as vsp
+#import openvsp as vsp
 from GA import GA
+from Plane_Class import Plane
 priority = "low speed"
 #priority = "high speed"
 
 '''Fitness Function Weights'''
-mass = 4
-l_over_d = 4
-velocity = 10
-wingspan = 3
-endurance = 6
-total_range = 3
+mass = 1
+l_over_d = 1
+velocity = 1
+wingspan = 1
+endurance = 1
+total_range = 1
 
-q1= 150 #pop
-q2= 250 #generations
+'''Objective Scores'''
+mass_obj = 10 #meassured in kg
+ld_obj = 10 #ratio
+vel_obj = 15 #m/s
+wingspan_obj = 2.5 #meters
+end_obj = 2 #hours
+range_obj = 200 #km 
+
+q1= 100 #pop
+q2= 100 #generations
 q3= 0.05 #keepers
 q4= 2 #mutation rate
 
 '''Do you want plots? (1), (0)'''
 plots = 1
-export_to_VSP = 1
-final = GA(priority, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4)
+export_to_VSP = 0
+final, record, objects = GA(priority, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
 
-if export_to_VSP ==0:
+if export_to_VSP ==1:
     # Create a new VSP model
     vsp.VSPRenew()
 
@@ -64,13 +73,16 @@ if export_to_VSP ==0:
     vsp.WriteVSPFile("genetic_alg.vsp3")
 
 '''Print data'''
-print("fuselage diameter: "  + str(final.fuse_diam))
-print("fuselage length: "  + str(final.fuse_length))
-print("chord length: "  + str(final.chord_length))
-print("Wingspan: "  + str(final.wingspan))
-print("Motor throttle: "  + str(final.throttle))
-print("Length of motor array "  + str(len(final.motor)))
-
-print("Velocity: "  + str(final.cruise_velocity))
-print("Stall Speed: "  + str(final.stall_speed))
-print("Motor: "  + str(final.motor))
+#print("fuselage diameter: "  + str(final.fuse_diam))
+#print("fuselage length: "  + str(final.fuse_length))
+#print("chord length: "  + str(final.chord_length))
+#print("Wingspan: "  + str(final.wingspan))
+#print("Motor throttle: "  + str(final.throttle))
+#print("Length of motor array "  + str(len(final.motor)))
+#
+#print("Velocity: "  + str(final.cruise_velocity))
+#print("Stall Speed: "  + str(final.stall_speed))
+print("final score: " + str(final.score))
+#print("Motor: "  + str(final.motor))
+amps = Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']
+print(amps)

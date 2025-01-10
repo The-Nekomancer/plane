@@ -6,7 +6,7 @@ Created on Mon Sep 23 16:57:00 2024
 """
 import numpy as np
 import pandas as pd
-# All measurements are in inch, pounds, seconds
+# All measurements are in kg, meters, seconds
 
 class Plane:
     air_desnsity = 1.225 #kg per m cubed
@@ -23,22 +23,23 @@ class Plane:
     # priority = {"Low Speed", "High Speed", "Range", "Lift", "Endurance"}
     priority = [1,2,3,4,5]
     def __init__(self, name = "test plane",
-                 wingspan = 2.540,
-                 airfoil = naca_2412,
-                 payload_mass = 4,
-                 cruise_velocity = 15.24,
-                 priority = priority[0],
-                 motor = motors[0],
-                 fuse_diam = .254,
-                 fuse_length = .635,
-                 bat = bat_8000_6s,
-                 batteries = 2,
-                 payload_skid_width = .1,
-                 payload_skid_length = .15,
-                 vtail_chord = 0.04,
-                 alpha = 5,
-                 throttle = 3,
-                 motor_num = 0):
+                wingspan = 2.540,
+                airfoil = naca_2412,
+                payload_mass = 4,
+                cruise_velocity = 15.24,
+                priority = priority[0],
+                motor = motors[0],
+                fuse_diam = .254,
+                fuse_length = .635,
+                bat = bat_8000_6s,
+                batteries = 2,
+                payload_skid_width = .1,
+                payload_skid_length = .15,
+                vtail_chord = 0.04,
+                alpha = 5,
+                throttle = 3,
+                motor_num = 0,
+                score = 0):
         self.name = name
         self.wingspan = wingspan
         self.chord_length = wingspan/9
@@ -65,6 +66,7 @@ class Plane:
         self.alpha = alpha
         self.throttle = throttle
         self.motor_num = motor_num
+        self.score = 0
         
         """
         CALCULATION METHODS
@@ -93,7 +95,7 @@ class Plane:
     def calc_range(self):
         self.calc_endurance()
         self.calc_velocity()
-        self.range = self.endurance * self.cruise_velocity * 60**2
+        self.range = self.endurance * self.cruise_velocity * 60**2/1000
     
     def calc_lift(self):
         # self.CL = self.airfoil["cl"]
