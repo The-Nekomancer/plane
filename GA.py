@@ -112,20 +112,20 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
                             objects[g].throttle = objects[g].throttle - 1
                             objects[g].calc_velocity()
                             objects[g].calc_lift()
-                        elif objects[g].motor_num < len(Plane.motors)-1:
-                            objects[g].motor_num = objects[g].motor_num + 1
+                        elif objects[g].motor_num > len(Plane.motors)-1:
+                            objects[g].motor_num = objects[g].motor_num - 1
                             objects[g].motor = Plane.motors[objects[g].motor_num]
-                            objects[g].throttle = 1
+                            objects[g].throttle = len(Plane.motors) - 1
                             objects[g].calc_velocity()
                             objects[g].calc_lift()
                         else:
                             i ==3
                             break
                 if i == 3:
-                    while objects[g].lift <= objects[g].mass* 0.95:
-                            if objects[g].wingspan <= objects[g].max_wingspan*0.98:
-                                objects[g].wingspan = objects[g].wingspan * 1.01
-                                objects[g].chord_length = objects[g].chord_length * 1.01
+                    while objects[g].lift >= objects[g].mass* 1.05:
+                            if objects[g].wingspan >= objects[g].min_wingspan*1.1:
+                                objects[g].wingspan = objects[g].wingspan * 0.99
+                                objects[g].chord_length = objects[g].chord_length * 0.99
                                 objects[g].calc_lift()
                                 objects[g].calc_velocity()
                             else:
@@ -137,8 +137,6 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
             objects[g].calc_vtail_lift()
             objects[g].calc_drag()
             objects[g].calc_velocity()
-
-
 
         '''Evaluation'''
         # Every object in our population is given a score, and added to the list of scores
@@ -212,11 +210,6 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         objects = []
         crossover = []
         for p in range(len(keepers)):
-            #wingspan = keepers[r.randint(0, len(keepers)-1)].wingspan
-            #batteries = keepers[r.randint(0, len(keepers)-1)].batteries
-            #motor = keepers[r.randint(0, len(keepers)-1)].motor
-            #alpha = keepers[r.randint(0, len(keepers)-1)].alpha
-            #throttle = keepers[r.randint(0, len(keepers)-1)].throttle
             wingspan = wings[r.randint(0, len(wings)-1)]
             batteries = bat[r.randint(0, len(bat)-1)]
             motor = motors[r.randint(0, len(motors)-1)]
@@ -387,6 +380,48 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         final.calc_vtail_lift()
         final.calc_drag()
         final.calc_velocity()
+        if final.lift >= final.mass* 1.05:
+            i = 1#r.randint(1,3)
+            if i == 1:
+                while final.lift >= final.mass * 1.05:
+                    if final.alpha >= 2:
+                        final.alpha = final.alpha - 0.25
+                        final.calc_lift()
+                        final.calc_velocity()
+                    else:
+                        i == 2
+                        break
+            if i == 2:
+                while final.lift >= final.mass* 1.05:
+                    if final.throttle > 2:
+                        final.throttle = final.throttle - 1
+                        final.calc_velocity()
+                        final.calc_lift()
+                    elif final.motor_num > len(Plane.motors)-1:
+                        final.motor_num = final.motor_num - 1
+                        final.motor = Plane.motors[final.motor_num]
+                        final.throttle = len(Plane.motors) - 1
+                        final.calc_velocity()
+                        final.calc_lift()
+                    else:
+                        i ==3
+                        break
+            if i == 3:
+                while final.lift >= final.mass* 1.05:
+                        if final.wingspan >= final.min_wingspan*1.1:
+                            final.wingspan = final.wingspan * 0.99
+                            final.chord_length = final.chord_length * 0.99
+                            final.calc_lift()
+                            final.calc_velocity()
+                        else:
+                            del final
+            final.calc_mass()
+            final.calc_endurance()
+            final.calc_range()
+            final.calc_lift()
+            final.calc_vtail_lift()
+            final.calc_drag()
+            final.calc_velocity()
 
     # Final score is calculated
     mass_score = (abs(mass_obj - final.mass)/mass_obj)
@@ -397,6 +432,9 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
     range_score = (abs(range_obj - final.range)/range_obj)
     final.score = ((A)*(1-mass_score) + (B)*(1-ld_score) + (C)*(1-vel_score) + (D)*(1-wingspan_score) + (E)*(1-end_score) + (F)*(1-range_score))
 
+    if final.score <= 0:
+        plots = 0
+        print("The Algorithm failed to produce a viable options based on the requirements")
     # All of our plots are generated
     if plots == 1:
         '''wingspan'''
@@ -456,7 +494,6 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         '''Endurance and Range'''
         fig = plt.figure(7)
         plt.scatter(all_end,all_range, marker = ".", label="Solutions")
-        # plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
         plt.scatter(final.endurance, final.range, label="Final")
         plt.legend()
         plt.title("Performance Curve Comparison")
@@ -466,7 +503,6 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         '''L over D'''
         fig = plt.figure(8)
         plt.scatter(all_drag,all_lift, marker = ".", label="Solutions")
-        # plt.scatter(mutant_end,mutant_range, marker = ".", label="Mutants")
         plt.scatter(final.drag, final.lift, label="Final")
         plt.legend()
         plt.title("Performance Curve Comparison")
@@ -481,8 +517,6 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         plt.title("CD and CL w/ respect to alpha")
         plt.subplot(2, 1,2)
         plt.scatter(Plane.naca2412['Alpha'],Plane.naca2412['CD'], marker='.',label="CD")
-        # plt.scatter(Plane.naca2412['Alpha'],(Plane.naca2412['CL']/Plane.naca2412['CD']), marker='.',label="L/D")
-        # plt.legend()
         plt.xlabel("Alpha")
         plt.ylabel("CD")
         plt.show()
