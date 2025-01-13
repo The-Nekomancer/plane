@@ -4,7 +4,6 @@ Created on Mon Jan  6 09:38:38 2025
 
 @author: briggs
 """
-
 #import openvsp as vsp
 from GA import GA
 from Plane_Class import Plane
@@ -20,12 +19,12 @@ endurance = 1
 total_range = 1
 
 '''Objective Scores'''
-mass_obj = 10 #meassured in kg
+mass_obj = 9 #meassured in kg
 ld_obj = 10 #ratio
-vel_obj = 15 #m/s
-wingspan_obj = 2.5 #meters
+vel_obj = 25 #m/s
+wingspan_obj = 3 #meters
 end_obj = 2 #hours
-range_obj = 200 #km 
+range_obj = 200 #km
 
 q1= 100 #pop
 q2= 100 #generations
@@ -73,16 +72,18 @@ if export_to_VSP ==1:
     vsp.WriteVSPFile("genetic_alg.vsp3")
 
 '''Print data'''
-#print("fuselage diameter: "  + str(final.fuse_diam))
-#print("fuselage length: "  + str(final.fuse_length))
-#print("chord length: "  + str(final.chord_length))
-#print("Wingspan: "  + str(final.wingspan))
-#print("Motor throttle: "  + str(final.throttle))
-#print("Length of motor array "  + str(len(final.motor)))
-#
-#print("Velocity: "  + str(final.cruise_velocity))
-#print("Stall Speed: "  + str(final.stall_speed))
+print("fuselage diameter: "  + str(final.fuse_diam))
+print("fuselage length: "  + str(final.fuse_length))
+print("chord length: "  + str(final.chord_length))
+print("Wingspan: "  + str(final.wingspan))
+print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)']))
+print("Motor: "  + str(final.motor_num))
+print("Velocity: "  + str(final.cruise_velocity))
+print("Stall Speed: "  + str(final.stall_speed))
 print("final score: " + str(final.score))
-#print("Motor: "  + str(final.motor))
-amps = Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']
-print(amps)
+print("final lift: " + str(final.lift))
+print("final mass: " + str(final.mass))
+print("final alpha: " + str(final.alpha))
+print("final endurance: " + str(final.endurance))
+print("final range: " + str(final.range))
+print("final current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']))
