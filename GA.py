@@ -35,7 +35,9 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         motor = Plane.motors[motor_num]
         throttle = r.randint(2,len(motor)-1)
         alpha = r.randint(0,40)/4
-        obj = Plane(wingspan=wing,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num)
+        airfoil_num = r.randint(0, 1)
+        airfoil = Plane.airfoils[airfoil_num]
+        obj = Plane(wingspan=wing,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num, airfoil_num=airfoil_num, airfoil = airfoil)
         objects.append(obj)
         pure.append(obj)
         record.append(obj)
@@ -174,10 +176,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         # This is in contrast to prioritizing a single metric and moving the rest to constraints
         score = []
         for k in range(pop):
-            if priority == "low speed":
-                score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
-            elif priority == "high speed":
-                score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*end_score[k] + (F)*range_score[k])
+            score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
 
         '''Selection'''
         score_to_beat = np.linspace(min(score), max(score), pop)
@@ -186,8 +185,11 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         wings = []
         bat = []
         motors = []
+        moto_sel = []
         alfa = []
         throttles = []
+        airfoils = []
+        airfoil_nums = []
 
         # In order for a plane to pass on its genes, it must be in the top 5% of its generation
         # Several objects tied for 5th will all be included, this is because if mutations
@@ -204,6 +206,9 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
             motors.append(keepers[h].motor)
             alfa.append(keepers[h].alpha)
             throttles.append(keepers[h].throttle)
+            moto_sel.append(keepers[h].motor_num)
+            airfoils.append(keepers[h].airfoil)
+            airfoil_nums.append(keepers[h].airfoil_num)
 
         '''Crossover'''
         #Uniform crossover pattern, each chromasom is crossed over
@@ -212,11 +217,15 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         for p in range(len(keepers)):
             wingspan = wings[r.randint(0, len(wings)-1)]
             batteries = bat[r.randint(0, len(bat)-1)]
-            motor = motors[r.randint(0, len(motors)-1)]
+            moto_num = moto_sel[r.randint(0, len(moto_sel)-1)]
+            motor = motors[moto_num]
             alpha = alfa[r.randint(0, len(alfa)-1)]
             throttle = throttles[r.randint(0, len(throttles)-1)]
+            airfoil_sel = r.randint(0, len(airfoils)-1)
+            airfoil = airfoils[airfoil_sel]
+            airfoil_num = airfoil_nums[airfoil_sel]
 
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,alpha=alpha, throttle=throttle)
+            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha, throttle=throttle, airfoil=airfoil, airfoil_num = airfoil_num)
             crossover.append(obj)
             objects.append(obj)
 
@@ -227,10 +236,14 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
             moto_sel = keepers[r.randint(0, len(keepers)-1)].motor_num
             motor_num = keepers[moto_sel].motor_num
             motor = keepers[moto_sel].motor
+            airfoil_sel = r.randint(0, len(keepers)-1)
+            airfoil = keepers[airfoil_sel].airfoil
+            airfoil_num = keepers[airfoil_sel].airfoil_num
+            
             alpha = keepers[r.randint(0, len(keepers)-1)].alpha
             throttle = keepers[r.randint(0, len(keepers)-1)].throttle
             obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num)
-            objects.append(obj)
+            objects.append(obj) 
             record.append(obj)
             pure.append(obj)
 

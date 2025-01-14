@@ -32,9 +32,10 @@ q3= 0.05 #keepers
 q4= 2 #mutation rate
 
 '''Do you want plots? (1), (0)'''
-plots = 0
+plots = 1
 export_to_VSP = 1
 final, record, objects = GA(priority, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
+
 
 if export_to_VSP ==1:
     # Create a new VSP model
@@ -81,7 +82,7 @@ if export_to_VSP ==1:
     vsp.SetParmVal( wid, "ThickChord", "XSecCurve_0", 0.12 )
     vsp.Update()
 
-    '''Horizontal Stab'''
+    '''Vtail Stab'''
     hs = vsp.AddGeom( "WING", "" )
     vsp.InsertXSec( hs, 1, vsp.XS_FOUR_SERIES )
     vsp.SetParmVal(hs, "X_Rel_Location", "XForm", total_length*0.85)
@@ -122,3 +123,4 @@ print("final alpha: " + str(final.alpha))
 print("final endurance: " + str(final.endurance))
 print("final range: " + str(final.range))
 print("final current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']))
+print("airfoil: "  + str(final.airfoil_num))

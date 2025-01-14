@@ -10,13 +10,19 @@ import pandas as pd
 
 class Plane:
     air_desnsity = 1.225 #kg per m cubed
+    '''Airfoils'''
     naca2412 = pd.read_csv('naca2412.csv')
+    naca4412 = pd.read_csv('naca4412.csv')
+    
+    '''Motors'''
     v602_kv180 = pd.read_csv('V602_KV180.csv')
     v10l_kv170 = pd.read_csv('V10L_KV170.csv')
-    airfoils = (["naca_0012", "naca_2412"])
+    
+    
     naca_0012 = {"cl": -0.1034, "alpha": -1, "cd": 0.0064,"cm": -0.0032, "CLmax": 1.2363 }
     naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
     
+    airfoils = ([naca2412, naca4412])
     motors = ([v602_kv180, v10l_kv170])
     bat_8000_6s = {"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     
@@ -24,7 +30,8 @@ class Plane:
     priority = [1,2,3,4,5]
     def __init__(self, name = "test plane",
                 wingspan = 2.540,
-                airfoil = naca_2412,
+                airfoil = naca2412,
+                airfoil_num = 0,
                 payload_mass = 4,
                 cruise_velocity = 15.24,
                 priority = priority[0],
@@ -44,6 +51,7 @@ class Plane:
         self.wingspan = wingspan
         self.chord_length = wingspan/9
         self.airfoil = airfoil
+        self.airfoil_num = airfoil_num
         self.payload_mass = payload_mass
         self.cruise_velocity =  cruise_velocity
         self.mass = payload_mass*3
@@ -66,7 +74,7 @@ class Plane:
         self.alpha = alpha
         self.throttle = throttle
         self.motor_num = motor_num
-        self.score = 0
+        self.score = score
         
         """
         CALCULATION METHODS
@@ -84,7 +92,7 @@ class Plane:
         motor_mass = 0.4
         self.mass = bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass + motor_mass
         self.center_of_gravity = round(self.fuse_length * 0.33,2)
-        self.wing_pos = (self.fuse_diam/2)# - self.fuse_diam*0.2
+        self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2
         
     def calc_endurance(self):
         amps = Plane.motors[self.motor_num].at[(self.throttle), 'Current (A)']
@@ -98,11 +106,10 @@ class Plane:
         self.range = self.endurance * self.cruise_velocity * 60**2/1000
     
     def calc_lift(self):
-        # self.CL = self.airfoil["cl"]
-        self.CL = Plane.naca2412.loc[60 + 4*self.alpha, 'CL']
+        self.CL = Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CL']
         self.lift = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * self.CL * self.wingspan * self.chord_length)/9.81
         # air density in kg/m3         (m/s)                     no unit       m                mm  convert to Kg
-        self.moment = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * self.airfoil["cm"] * self.wingspan * self.chord_length)
+        self.moment = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CM'] * self.wingspan * self.chord_length)
     
     def calc_vtail_lift(self):
         CL = Plane.naca_0012["cl"]
@@ -111,12 +118,12 @@ class Plane:
     
     def calc_drag(self):
         # self.CD = self.airfoil["cd"]
-        self.CD = Plane.naca2412.loc[60 + 4*self.alpha, 'CD']
+        self.CD = Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CD']
         self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.2) * self.wingspan * self.chord_length)/9.81
     
     def calc_velocity(self):
         Plane.calc_mass(self)
-        self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * self.airfoil["CLmax"] * self.wingspan * self.chord_length))
+        self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * Plane.airfoils[self.airfoil_num].loc[62, 'CL'] * self.wingspan * self.chord_length))
         self.calc_drag()
         thrust = Plane.motors[self.motor_num].at[(self.throttle), 'Thrust (kg)']
         while self.drag < thrust: # if thrust from the motor is greater drag at velocity 'x'
