@@ -95,7 +95,7 @@ class Plane:
         self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2
         
     def calc_endurance(self):
-        amps = Plane.motors[self.motor_num].at[(self.throttle), 'Current (A)']
+        amps = Plane.motors[self.motor_num].loc[(self.throttle), 'Current (A)']
         self.capacity = self.bat["capacity"] * self.batteries / 1000
         self.endurance = self.capacity/amps
         #defined in hours

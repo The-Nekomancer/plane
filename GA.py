@@ -11,7 +11,8 @@ import random as r
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj):
+# r.seed(36)
+def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj):
     '''Initial Population Creation'''
     record = []
     objects = []
@@ -29,11 +30,11 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
     keep = int(round(pop*q3,0))
     mutation_rate = q4
     for i in range(pop):
-        wing= r.uniform(1,3)
-        batteries = r.randint(1, 4)
-        motor_num = r.randint(0, 1)
+        wing= r.uniform(min_wing,max_wing)
+        batteries = r.randint(min_bat, max_bat)
+        motor_num = r.randint(0, len(Plane.motors)-1)
         motor = Plane.motors[motor_num]
-        throttle = r.randint(2,len(motor)-1)
+        throttle = r.randint(1,4)
         alpha = r.randint(0,40)/4
         airfoil_num = r.randint(0, 1)
         airfoil = Plane.airfoils[airfoil_num]
@@ -71,12 +72,12 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
                             objects[g].throttle = objects[g].throttle + 1
                             objects[g].calc_velocity()
                             objects[g].calc_lift()
-                        elif objects[g].motor_num < len(Plane.motors)-1:
-                            objects[g].motor_num = objects[g].motor_num + 1
-                            objects[g].motor = Plane.motors[objects[g].motor_num]
-                            objects[g].throttle = 1
-                            objects[g].calc_velocity()
-                            objects[g].calc_lift()
+                        #elif objects[g].motor_num < len(Plane.motors)-1:
+                        #    objects[g].motor_num = objects[g].motor_num + 1
+                        #    objects[g].motor = Plane.motors[objects[g].motor_num]
+                        #    objects[g].throttle = 1
+                        #    objects[g].calc_velocity()
+                        #    objects[g].calc_lift()
                         else:
                             i ==3
                             break
@@ -114,12 +115,12 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
                             objects[g].throttle = objects[g].throttle - 1
                             objects[g].calc_velocity()
                             objects[g].calc_lift()
-                        elif objects[g].motor_num > len(Plane.motors)-1:
-                            objects[g].motor_num = objects[g].motor_num - 1
-                            objects[g].motor = Plane.motors[objects[g].motor_num]
-                            objects[g].throttle = len(Plane.motors) - 1
-                            objects[g].calc_velocity()
-                            objects[g].calc_lift()
+                        #elif objects[g].motor_num > len(Plane.motors)-1:
+                        #    objects[g].motor_num = objects[g].motor_num - 1
+                        #    objects[g].motor = Plane.motors[objects[g].motor_num]
+                        #    objects[g].throttle = len(Plane.motors) - 1
+                        #    objects[g].calc_velocity()
+                        #    objects[g].calc_lift()
                         else:
                             i ==3
                             break
@@ -165,7 +166,8 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
             total_ld = total_ld + (objects[j].lift/objects[j].drag)
         for u in range(pop):
             mass_score.append(abs(mass_obj - objects[u].mass)/mass_obj)
-            ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
+            # ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
+            ld_score.append(abs(ld_obj - (Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CL']/Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CD']))/ld_obj)
             vel_score.append(abs(vel_obj - objects[u].cruise_velocity)/vel_obj)
             wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)
             end_score.append(abs(end_obj - objects[u].endurance)/end_obj)
@@ -217,8 +219,9 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         for p in range(len(keepers)):
             wingspan = wings[r.randint(0, len(wings)-1)]
             batteries = bat[r.randint(0, len(bat)-1)]
-            moto_num = moto_sel[r.randint(0, len(moto_sel)-1)]
-            motor = motors[moto_num]
+            moto_select = moto_sel[r.randint(0, len(moto_sel)-1)]
+            moto_num = moto_select
+            motor = Plane.motors[moto_select]
             alpha = alfa[r.randint(0, len(alfa)-1)]
             throttle = throttles[r.randint(0, len(throttles)-1)]
             airfoil_sel = r.randint(0, len(airfoils)-1)
@@ -233,7 +236,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         while len(objects) < len(range(pop)):
             wingspan = r.uniform(min(wings)*1, max(wings)*1)
             batteries = r.randint(min(bat), max(bat))
-            moto_sel = keepers[r.randint(0, len(keepers)-1)].motor_num
+            moto_sel = r.randint(0, len(keepers)-1)
             motor_num = keepers[moto_sel].motor_num
             motor = keepers[moto_sel].motor
             airfoil_sel = r.randint(0, len(keepers)-1)
@@ -253,10 +256,13 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
             if r.uniform(0, 100) >= (100 - mutation_rate):
                 objects[u].wingspan = r.uniform(1, 3)
                 objects[u].batteries = r.randint(1, 4)
-                objects[u].motor = keepers[r.randint(0, len(keepers)-1)].motor
+                moto = r.randint(0, len(keepers)-1)
+                objects[u].motor_num = keepers[moto].motor_num
+                objects[u].motor = keepers[moto].motor
+                
                 objects[u].alpha = r.randint(0,40)/4
-                objects[u].throttle = r.randint(1,len(objects[u].motor)-1)
-
+                objects[u].throttle = r.randint(1,4)
+                #objects[u].throttle = r.randint(1,len(objects[u].motor)-1)
                 mutants.append(objects[u])
                 all_mutants.append(objects[u])
                 mutants_list.append(len(record) - len(objects) + u -1)
@@ -330,11 +336,13 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
 
     '''Final Airplane'''
     # Here the final planes charecteristics are finalized and saved
-    final_wing = np.mean(keepers[-1].wingspan)
+    final_wing = pure[-1].wingspan
     final_bat = pure[-1].batteries
     final_motor = pure[-1].motor
     final_alpha = pure[-1].alpha
-    final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,alpha=final_alpha)
+    final_airfoil = pure[-1].airfoil
+    final_throttle = pure[-1].throttle
+    final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,alpha=final_alpha, airfoil = final_airfoil, throttle = final_throttle)
     final.wingspan = round(final.wingspan,3)
     final.chord_length = round(final.chord_length,3)
     final.fuse_diam = round(final.fuse_diam,3)
@@ -410,12 +418,12 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
                         final.throttle = final.throttle - 1
                         final.calc_velocity()
                         final.calc_lift()
-                    elif final.motor_num > len(Plane.motors)-1:
-                        final.motor_num = final.motor_num - 1
-                        final.motor = Plane.motors[final.motor_num]
-                        final.throttle = len(Plane.motors) - 1
-                        final.calc_velocity()
-                        final.calc_lift()
+                    #elif final.motor_num > len(Plane.motors)-1:
+                    #    final.motor_num = final.motor_num - 1
+                    #    final.motor = Plane.motors[final.motor_num]
+                    #    final.throttle = len(Plane.motors) - 1
+                    #    final.calc_velocity()
+                    #    final.calc_lift()
                     else:
                         i ==3
                         break
@@ -444,6 +452,7 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
     end_score = (abs(end_obj - final.endurance)/end_obj)
     range_score = (abs(range_obj - final.range)/range_obj)
     final.score = ((A)*(1-mass_score) + (B)*(1-ld_score) + (C)*(1-vel_score) + (D)*(1-wingspan_score) + (E)*(1-end_score) + (F)*(1-range_score))
+    final_error = ((A+B+C+D+E+F - final.score)/(A+B+C+D+E+F))*100
 
     if final.score <= 0:
         plots = 0
@@ -540,4 +549,4 @@ def GA(priority, A, B, C, D, E, F, plots, q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wi
         plt.ylabel("score")
         plt.title("Scores over time")
         plt.show()
-    return final, record, objects
+    return final, record, objects, final_error

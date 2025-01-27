@@ -4,9 +4,11 @@ Created on Mon Jan  6 09:38:38 2025
 
 @author: briggs
 """
-import openvsp as vsp
+#import openvsp as vsp
 from GA import GA
 from Plane_Class import Plane
+import matplotlib.pyplot as plt
+import numpy as np
 priority = "low speed"
 #priority = "high speed"
 
@@ -18,24 +20,71 @@ wingspan = 1
 endurance = 1
 total_range = 1
 
+'''Min/Max sizes'''
+min_bat = 1
+max_bat = 4
+min_wing = 1
+max_wing = 3
+
 '''Objective Scores'''
 mass_obj = 10 #meassured in kg
-ld_obj = 10 #ratio
+ld_obj = 57 #ratio
 vel_obj = 20 #m/s
-wingspan_obj = 3 #meters
+wingspan_obj = 2.75 #meters
 end_obj = 2 #hours
 range_obj = 200 #km
 
+'''GA TWEAKING'''
 q1= 100 #pop
 q2= 100 #generations
 q3= 0.05 #keepers
 q4= 2 #mutation rate
 
 '''Do you want plots? (1), (0)'''
-plots = 1
-export_to_VSP = 1
-final, record, objects = GA(priority, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
+plots = 0
+export_to_VSP = 0
+export_to_flight_stream = 0
+#final, record, objects = GA(priority, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
 
+'''Optimization'''
+true_finals = []
+true_errors = []
+for p in range(1,11):
+    scores = []
+    errors = []
+    finals = []
+    for i in range(1,50):
+        print("Set: " +str(p))
+        print("Iteration: " + str(i))
+        final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
+        scores.append(final.score)
+        # print(final.score)
+        errors.append(round(final_error,5))
+        finals.append(final)
+        # print(scores)
+
+    true_finals.append(finals[errors.index(round(min(errors),5))])
+    true_errors.append(round(min(errors),5))
+    
+true_final = true_finals[true_errors.index(round(min(true_errors),5))]
+
+fig = plt.figure(1)
+plt.plot(true_errors)
+plt.title("Total Error 50 pop, 100 gens")
+plt.xlabel("Iteration Number")
+plt.ylabel("Percent Error")
+plt.show
+
+squared_deviation = []
+m = np.mean(errors)
+good_list = []
+for r in range(len(errors)):
+    s = (errors[r]- m)**2
+    squared_deviation.append(s)
+    if errors[r] <= m:
+        good_list.append(r)
+    
+std = np.sqrt(sum(squared_deviation)/len(errors))
 
 if export_to_VSP ==1:
     # Create a new VSP model
@@ -106,6 +155,11 @@ if export_to_VSP ==1:
     vsp.Update()
 
     vsp.WriteVSPFile("genetic_alg.vsp3")
+
+if export_to_VSP & export_to_flight_stream ==1:
+    '''create .igs file'''
+    vsp.ExportFile("genetic_algorithm_model.igs", vsp.SET_ALL, vsp.EXPORT_IGES) 
+    
 
 '''Print data'''
 print("fuselage diameter: "  + str(final.fuse_diam))
