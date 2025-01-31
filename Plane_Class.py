@@ -10,9 +10,32 @@ import pandas as pd
 
 class Plane:
     air_desnsity = 1.225 #kg per m cubed
+    
     '''Airfoils'''
     naca2412 = pd.read_csv('naca2412.csv')
     naca4412 = pd.read_csv('naca4412.csv')
+    PERC_JOUKOVSKY = pd.read_csv('12PERC JOUKOVSKY.csv')
+    A_18_original = pd.read_csv('A-18 original.csv')
+    A_18_smoothed = pd.read_csv('A-18 smoothed.csv')
+    B_29_TIP = pd.read_csv('B-29 TIP.csv')
+    B_29 = pd.read_csv('B-29.csv')
+    DAE_11 = pd.read_csv('DAE-11.csv')
+    DEFIANT_CANARD = pd.read_csv('DEFIANT CANARD.csv')
+    e169 = pd.read_csv('e169.csv')
+    EPPLER_1211 = pd.read_csv('EPPLER 1211.csv')
+    FAGEANDCOLLINS = pd.read_csv('FAGEANDCOLLINS.csv')
+    GIII = pd.read_csv('GIII.csv')
+    GM15 = pd.read_csv('GM15.csv')
+    GRUMMAN = pd.read_csv('GRUMMAN.csv')
+    HUGHES = pd.read_csv('HUGHES.csv')
+    ISA = pd.read_csv('ISA.csv')
+    JOUKOVSKY = pd.read_csv('JOUKOVSKY.csv')
+    K3311 = pd.read_csv('K3311.csv')
+    LOCKHEED_C_5 = pd.read_csv('LOCKHEED C-5.csv')
+    LOCKHEED_C_141 = pd.read_csv('LOCKHEED C-141.csv')
+    OA213 = pd.read_csv('OA213.csv')
+    ONERA = pd.read_csv('ONERA.csv')
+    PSU = pd.read_csv('PSU.csv')
     
     '''Motors'''
     v602_kv180 = pd.read_csv('V602_KV180.csv')
@@ -22,7 +45,11 @@ class Plane:
     naca_0012 = {"cl": -0.1034, "alpha": -1, "cd": 0.0064,"cm": -0.0032, "CLmax": 1.2363 }
     naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
     
-    airfoils = ([naca2412, naca4412])
+    # airfoils = ([naca2412,naca4412,PERC_JOUKOVSKY,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
+    airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
+    # airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
+    # airfoils = ([naca2412,naca4412,e169])
+    
     motors = ([v602_kv180, v10l_kv170])
     bat_8000_6s = {"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     
@@ -36,7 +63,7 @@ class Plane:
                 cruise_velocity = 15.24,
                 priority = priority[0],
                 motor = motors[0],
-                fuse_diam = .254,
+                fuse_diam = .2,
                 fuse_length = .635,
                 bat = bat_8000_6s,
                 batteries = 2,
@@ -123,7 +150,7 @@ class Plane:
     
     def calc_velocity(self):
         Plane.calc_mass(self)
-        self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * Plane.airfoils[self.airfoil_num].loc[62, 'CL'] * self.wingspan * self.chord_length))
+        self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CL'] * self.wingspan * self.chord_length))
         self.calc_drag()
         thrust = Plane.motors[self.motor_num].at[(self.throttle), 'Thrust (kg)']
         while self.drag < thrust: # if thrust from the motor is greater drag at velocity 'x'

@@ -35,8 +35,8 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         motor_num = r.randint(0, len(Plane.motors)-1)
         motor = Plane.motors[motor_num]
         throttle = r.randint(1,4)
-        alpha = r.randint(0,40)/4
-        airfoil_num = r.randint(0, 1)
+        alpha = r.randint(0,35)/4
+        airfoil_num = r.randint(0, len(Plane.airfoils)-1)
         airfoil = Plane.airfoils[airfoil_num]
         obj = Plane(wingspan=wing,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num, airfoil_num=airfoil_num, airfoil = airfoil)
         objects.append(obj)
@@ -59,7 +59,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
                 i = 1#r.randint(1,3)
                 if i == 1:
                     while objects[g].lift <= objects[g].mass * 0.95:
-                        if objects[g].alpha <= 10:
+                        if objects[g].alpha <= 9:
                             objects[g].alpha = objects[g].alpha + 0.25
                             objects[g].calc_lift()
                             objects[g].calc_velocity()
@@ -228,7 +228,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             airfoil = airfoils[airfoil_sel]
             airfoil_num = airfoil_nums[airfoil_sel]
 
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha, throttle=throttle, airfoil=airfoil, airfoil_num = airfoil_num)
+            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
             crossover.append(obj)
             objects.append(obj)
 
@@ -242,10 +242,9 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             airfoil_sel = r.randint(0, len(keepers)-1)
             airfoil = keepers[airfoil_sel].airfoil
             airfoil_num = keepers[airfoil_sel].airfoil_num
-            
             alpha = keepers[r.randint(0, len(keepers)-1)].alpha
             throttle = keepers[r.randint(0, len(keepers)-1)].throttle
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num)
+            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
             objects.append(obj) 
             record.append(obj)
             pure.append(obj)
@@ -259,8 +258,10 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
                 moto = r.randint(0, len(keepers)-1)
                 objects[u].motor_num = keepers[moto].motor_num
                 objects[u].motor = keepers[moto].motor
-                
-                objects[u].alpha = r.randint(0,40)/4
+                ############AIRFOILS#############
+                objects[u].airfoil_num = r.randint(0, len(Plane.airfoils)-1)
+                objects[u].airfoil = Plane.airfoils[airfoil_num]
+                objects[u].alpha = r.randint(0,35)/4
                 objects[u].throttle = r.randint(1,4)
                 #objects[u].throttle = r.randint(1,len(objects[u].motor)-1)
                 mutants.append(objects[u])
@@ -339,10 +340,12 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
     final_wing = pure[-1].wingspan
     final_bat = pure[-1].batteries
     final_motor = pure[-1].motor
+    final_motor_num = pure[-1].motor_num
     final_alpha = pure[-1].alpha
     final_airfoil = pure[-1].airfoil
+    final_airfoil_num = pure[-1].airfoil_num
     final_throttle = pure[-1].throttle
-    final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,alpha=final_alpha, airfoil = final_airfoil, throttle = final_throttle)
+    final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,motor_num=final_motor_num,alpha=final_alpha,airfoil=final_airfoil,airfoil_num=final_airfoil_num,throttle=final_throttle)
     final.wingspan = round(final.wingspan,3)
     final.chord_length = round(final.chord_length,3)
     final.fuse_diam = round(final.fuse_diam,3)
@@ -360,7 +363,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         i = 1#r.randint(1,3)
         if i == 1:
             while final.lift <= final.mass * 0.95:
-                if final.alpha <= 10:
+                if final.alpha <= 9:
                     final.alpha = final.alpha + 0.25
                     final.calc_lift()
                     final.calc_velocity()

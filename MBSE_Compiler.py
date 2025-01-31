@@ -9,7 +9,7 @@ from GA import GA
 from Plane_Class import Plane
 import matplotlib.pyplot as plt
 import numpy as np
-import fuse_equations
+from fuse_equations import fuse_equations
 
 priority = "low speed"
 #priority = "high speed"
@@ -52,11 +52,11 @@ export_to_solidworks = 1
 '''Optimization'''
 true_finals = []
 true_errors = []
-for p in range(1,11):
+for p in range(1,3):
     scores = []
     errors = []
     finals = []
-    for i in range(1,51):
+    for i in range(1,2):
         print("Set: " +str(p))
         print("Iteration: " + str(i))
         final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)

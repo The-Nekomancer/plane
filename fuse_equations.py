@@ -1,10 +1,54 @@
 # -*- coding: utf-8 -*-
 import math
 
-def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan):
+def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan,wing_pos,airfoil,airfoil_num,motor_num,alpha,batteries,bat):
+    
+    '''Battery Bay'''
+    fuse_rad = fuse_diam /2
+    battery_length = bat["length"]
+    battery_width = bat["width"]
+    battery_height = bat["height"]
+    wing_shelf = fuse_rad*0.5
+    if batteries <=4:
+        bat_bay_length = battery_length + 0.02
+    elif batteries >4:
+        bat_bay_length = 2*battery_length + 0.02
+    else:
+        bat_bay_length = 3*battery_length + 0.02
+    shell = 0.002
+    
+    f = open("battery bay specifications.txt", "w")
+    f.write('"fuse_diam"= ' + str(fuse_diam)) #fuselage diameter
+    f.write('\n"fuse_rad"= ' + str(fuse_rad)) #fuselage radius
+    f.write('\n"battery_length"= ' + str(battery_length))
+    f.write('\n"battery_width"= ' + str(battery_width))
+    f.write('\n"battery_height"= ' + str(battery_height))
+    f.write('\n"bat_bay_length"= ' + str(bat_bay_length))
+    f.write('\n"wing_shlef"= ' + str(wing_shelf))
+    f.write('\n"shell"= ' + str(shell))
+    f.close()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     #fuse_diam = 10
-    fuse_rad = fuse_diam /2
+    
     fuse_length = 25
     #wingspan = 100
     wing_mount_diam = 3
@@ -22,15 +66,17 @@ def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan):
     tri_length = 1.5
     tri_degrees = 45
     tail_connect_top = fuse_rad - wing_rotation_vert + (fuse_rad * 0.05)
-    tail_connect_bottom = math.sqrt((tail_rad**2)-(tri_length/2)**2)
-    tail_base_len = math.sqrt((tail_rad**2)-(tri_length/2)**2)
-    tail_gamma = math.acos((-(tail_base_len**2)+(tail_rad**2)+((tri_length/2)**2))/(2*(tri_length/2)*tail_base_len))
-    tail_angle_of_int = math.pi - 2*(math.pi - tail_gamma - math.pi/4)
+    #tail_connect_bottom = math.sqrt((tail_rad**2)-(tri_length/2)**2)
+    #tail_base_len = math.sqrt((tail_rad**2)-(tri_length/2)**2)
+    #tail_gamma = math.acos((-(tail_base_len**2)+(tail_rad**2)+((tri_length/2)**2))/(2*(tri_length/2)*tail_base_len))
+    #tail_angle_of_int = math.pi - 2*(math.pi - tail_gamma - math.pi/4)
     fillet_rad = 0.1 ## inches
-    tail_chord_length = math.sqrt((tail_rad**2)+(tail_rad**2)-2*(tail_rad)*(tail_rad)*math.cos(tail_angle_of_int)) - 2*fillet_rad
+    #tail_chord_length = math.sqrt((tail_rad**2)+(tail_rad**2)-2*(tail_rad)*(tail_rad)*math.cos(tail_angle_of_int)) - 2*fillet_rad
     tail_offset = 2
     vtail_length = tail_length - tail_offset - 2
-    
+    battery_length = bat["length"]
+    battery_width = bat["width"]
+    battery_height = bat["height"]
     
     f = open("assem equations.txt", "w")
     f.write('"fuse_diam"= ' + str(fuse_diam)) #fuselage diameter
@@ -45,7 +91,7 @@ def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan):
     f.write('\n"wingspan"= ' + str(wingspan)) #tip to tip wingspan
     f.write('\n"wing_mount_diam"= ' + str(wing_mount_diam))
     f.write('\n"tail_elevation"= ' + str(tail_elevation))
-    f.write('\n"tail_chord_length"= ' +str(tail_chord_length))
+    #f.write('\n"tail_chord_length"= ' +str(tail_chord_length))
     f.write('\n"nose_cone_length"= ' + str(nose_cone_length))
     f.write('\n"nose_cone_splinex"= ' + str(nose_cone_splinex))
     f.write('\n"nose_cone_spliney"= ' + str(nose_cone_spliney))
@@ -56,5 +102,12 @@ def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan):
     f.write('\n"vtail_length"= ' + str(vtail_length))
     f.write('\n"fillet_rad"= ' + str(fillet_rad))
     f.write('\n"tail_connect_top"= ' + str(tail_connect_top))
-    f.write('\n"tail_connect_bottom"= ' + str(tail_connect_bottom))
+    #f.write('\n"tail_connect_bottom"= ' + str(tail_connect_bottom))
+    f.write('\n"wing_pos"= ' + str(wing_pos))
+    f.write('\n"airfoil_num"= ' + str(airfoil_num))
+    f.write('\n"alpha"= ' + str(alpha))
+    f.write('\n"batteries"= ' + str(batteries))
+    f.write('\n"battery_length"= ' + str(battery_length))
+    f.write('\n"battery_width"= ' + str(battery_width))
+    f.write('\n"battery_height"= ' + str(battery_height))
     f.close()
