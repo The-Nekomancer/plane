@@ -13,14 +13,10 @@ def vsp_results_viewer():
         for row in reader:
             if row[0] == 'CLi' and len(row) == 6:
                 CL.append(round((float(row[1])+float(row[2])+float(row[3])+float(row[4])+float(row[5]))/num_wakes,7))
-                print(CL)
             if row[0] == 'CDtot' and len(row) == 6:
                 CD.append(round((float(row[1])+float(row[2])+float(row[3])+float(row[4])+float(row[5]))/num_wakes,7))
-                print(CD)
             if row[0] == 'L/D' and len(row) == 6:
                 LD.append(round((float(row[1])+float(row[2])+float(row[3])+float(row[4])+float(row[5]))/num_wakes,7))
-                print(LD)
             if row[0] == 'Alpha' and len(row) == 6:
                 Alpha.append((float(row[1])+float(row[2])+float(row[3])+float(row[4])+float(row[5]))/num_wakes)
-                print(Alpha)
     return(CL,CD,LD,Alpha)

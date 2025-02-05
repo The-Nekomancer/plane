@@ -12,6 +12,8 @@ import numpy as np
 from fuse_equations import fuse_equations
 from vsp_geom_creator import vsp_geom_creator
 from vsp_results_viewer import vsp_results_viewer
+import time
+from performance_plotter import performance_plotter
 
 priority = "low speed"
 #priority = "high speed"
@@ -53,47 +55,29 @@ export_to_solidworks = 1
 '''Optimization'''
 true_finals = []
 true_errors = []
-for p in range(1,3):
+for p in range(1,2):
     scores = []
     errors = []
     finals = []
-    for i in range(1,2):
+    for i in range(1,25):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
         final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
         scores.append(final.score)
-        # print(final.score)
         errors.append(round(final_error,5))
         finals.append(final)
-            # print(scores)
 
     true_finals.append(finals[errors.index(round(min(errors),5))])
     true_errors.append(round(min(errors),5))
 
 true_final = true_finals[true_errors.index(round(min(true_errors),5))]
 
-# fig = plt.figure(1)
-# plt.plot(true_errors)
-# plt.title("Total Error 50 pop, 100 gens")
-# plt.xlabel("Iteration Number")
-# plt.ylabel("Percent Error")
-# plt.show
-
-# squared_deviation = []
-# m = np.mean(errors)
-# good_list = []
-# for r in range(len(errors)):
-#     s = (errors[r]- m)**2
-#     squared_deviation.append(s)
-#     if errors[r] <= m:
-#         good_list.append(r)
-
-# std = np.sqrt(sum(squared_deviation)/len(errors))
-
 """Export to OpenVSP"""
 if export_to_VSP ==1:
     vsp_geom_creator(true_final)
+    time.sleep(5)
     CL,CD,LD,Alpha = vsp_results_viewer()
+    performance_plotter(CL,CD,LD,Alpha)
 """Export to FlightStream"""
 if export_to_VSP & export_to_flight_stream ==1:
     '''create .igs file'''
