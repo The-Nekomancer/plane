@@ -166,7 +166,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             total_ld = total_ld + (objects[j].lift/objects[j].drag)
         for u in range(pop):
             mass_score.append(abs(mass_obj - objects[u].mass)/mass_obj)
-            # ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
+            #ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
             ld_score.append(abs(ld_obj - (Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CL']/Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CD']))/ld_obj)
             vel_score.append(abs(vel_obj - objects[u].cruise_velocity)/vel_obj)
             wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)

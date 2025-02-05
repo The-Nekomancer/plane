@@ -1,8 +1,8 @@
-"fuse_diam"= 0.254
-"fuse_rad"= 0.127
+"fuse_diam"= 0.2
+"fuse_rad"= 0.1
 "battery_length"= 0.165
 "battery_width"= 0.0635
 "battery_height"= 0.051
 "bat_bay_length"= 0.185
-"wing_shlef"= 0.0635
+"wing_shlef"= 0.05
 "shell"= 0.002

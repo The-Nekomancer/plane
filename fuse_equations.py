@@ -33,20 +33,6 @@ def fuse_equations(fuse_diam,fuse_length,wing_chord_length,wingspan,wing_pos,air
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     #fuse_diam = 10
     
     fuse_length = 25

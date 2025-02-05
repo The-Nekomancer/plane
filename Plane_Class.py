@@ -46,9 +46,9 @@ class Plane:
     naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
     
     # airfoils = ([naca2412,naca4412,PERC_JOUKOVSKY,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
-    airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
+    #airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
     # airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
-    # airfoils = ([naca2412,naca4412,e169])
+    airfoils = ([naca2412,naca4412])
     
     motors = ([v602_kv180, v10l_kv170])
     bat_8000_6s = {"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
@@ -146,7 +146,7 @@ class Plane:
     def calc_drag(self):
         # self.CD = self.airfoil["cd"]
         self.CD = Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CD']
-        self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.2) * self.wingspan * self.chord_length)/9.81
+        self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.02) * self.wingspan * self.chord_length)/9.81
     
     def calc_velocity(self):
         Plane.calc_mass(self)
