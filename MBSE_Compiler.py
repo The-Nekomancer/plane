@@ -59,7 +59,7 @@ for p in range(1,2):
     scores = []
     errors = []
     finals = []
-    for i in range(1,25):
+    for i in range(1,2):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
         final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat, mass,l_over_d,velocity,wingspan,endurance,total_range, plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj)
@@ -77,7 +77,7 @@ if export_to_VSP ==1:
     vsp_geom_creator(true_final)
     time.sleep(5)
     CL,CD,LD,Alpha = vsp_results_viewer()
-    performance_plotter(CL,CD,LD,Alpha)
+    performance_plotter(CL,CD,LD,Alpha,final)
 """Export to FlightStream"""
 if export_to_VSP & export_to_flight_stream ==1:
     '''create .igs file'''

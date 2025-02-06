@@ -1,2 +1,0 @@
-# Design Optimization 
-- Matthew Briggs 
