@@ -34,20 +34,19 @@ def performance_plotter(CL,CD,LD,Alpha,final):
 
     '''Power Required Curve'''
     thrust = []
-    volts = []
-    amps = []
     velocities = []
     power = []
-    for i in range(len(final.motor)):
-       thrust.append(Plane.motors[final.motor_num].loc[i,'Thrust (kg)'])
-       volts.append(Plane.motors[final.motor_num].loc[i,'Voltage (V)'])
-       amps.append(Plane.motors[final.motor_num].loc[i,'Current (A)'])
-       final.throttle = i
-       final.calc_velocity()
-       velocities.append(final.cruise_velocity)
-    for j in range(len(volts)):
-        power.append(volts[j]*amps[j])
+    for k in range(15):
+        final.alpha = k
+        for i in range(len(final.motor)):
+            thrust.append(Plane.motors[final.motor_num].loc[i,'Thrust (kg)'])
+            power.append(Plane.motors[final.motor_num].loc[i,'Inputpower (W)'])
+            final.throttle = i
+            final.calc_velocity()
+            velocities.append(final.cruise_velocity)
     
+    print("Thrust (kg): " + str(thrust))
+    print("Power (W): " + str(power))
     fig = plt.figure(4)
     plt.plot(velocities,power)
     plt.title("Power Required Curve")

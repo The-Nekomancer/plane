@@ -37,21 +37,25 @@ class Plane:
     ONERA = pd.read_csv('ONERA.csv')
     PSU = pd.read_csv('PSU.csv')
     
-    '''Motors'''
-    v602_kv180 = pd.read_csv('V602_KV180.csv')
-    v10l_kv170 = pd.read_csv('V10L_KV170.csv')
-    
-    
-    naca_0012 = {"cl": -0.1034, "alpha": -1, "cd": 0.0064,"cm": -0.0032, "CLmax": 1.2363 }
-    naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
-    
+    airfoils = ([naca2412,naca4412])
     # airfoils = ([naca2412,naca4412,PERC_JOUKOVSKY,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
     #airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
     # airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
-    airfoils = ([naca2412,naca4412])
+    naca_0012 = {"cl": -0.1034, "alpha": -1, "cd": 0.0064,"cm": -0.0032, "CLmax": 1.2363 }
+    naca_2412 = {"cl": 0.8030, "alpha": 5, "cd": 0.0092,"cm": -0.0512, "CLmax": 1.407 }
     
-    motors = ([v602_kv180, v10l_kv170])
-    bat_8000_6s = {"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
+    '''Motors'''
+    v602_kv180 = pd.read_csv('V602_KV180.csv')
+    v10l_kv170 = pd.read_csv('V10L_KV170.csv')
+    U8II = pd.read_csv('U8II.csv')
+    f60pro4 = pd.read_csv('f60pro4.csv')
+    motors = ([v602_kv180, v10l_kv170, U8II, f60pro4])
+    
+    '''Batteries'''
+    bat_8000_6s = {"cells": 6,"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
+    bat_2200_4s = {"cells": 4,"capacity": 2200, "mass": 0.1786, "length": 0.1016, "width": 0.04572, "height": 0.04572}
+    bat_1350_6s = {"cells": 6,"capacity": 1350, "mass": 0.259, "length": 0.076, "width": 0.034, "height": 0.051}
+    batts = ([bat_8000_6s,bat_2200_4s,bat_1350_6s])
     
     # priority = {"Low Speed", "High Speed", "Range", "Lift", "Endurance"}
     priority = [1,2,3,4,5]
@@ -59,14 +63,14 @@ class Plane:
                 wingspan = 2.540,
                 airfoil = naca2412,
                 airfoil_num = 0,
-                payload_mass = 4,
+                payload_mass = 0.25,
                 cruise_velocity = 15.24,
                 priority = priority[0],
-                motor = motors[0],
-                fuse_diam = .2,
-                fuse_length = .635,
-                bat = bat_8000_6s,
+                motor = motors[3],
+                bat = batts[2],
                 batteries = 2,
+                fuse_diam = 0.07,
+                fuse_length = .25,
                 payload_skid_width = .1,
                 payload_skid_length = .15,
                 vtail_chord = 0.04,
@@ -133,7 +137,7 @@ class Plane:
         self.range = self.endurance * self.cruise_velocity * 60**2/1000
     
     def calc_lift(self):
-        self.CL = Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CL']
+        self.CL = Plane.airfoils[self.airfoil_num].loc[4*self.alpha, 'CL']
         self.lift = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * self.CL * self.wingspan * self.chord_length)/9.81
         # air density in kg/m3         (m/s)                     no unit       m                mm  convert to Kg
         self.moment = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CM'] * self.wingspan * self.chord_length)
@@ -146,11 +150,11 @@ class Plane:
     def calc_drag(self):
         # self.CD = self.airfoil["cd"]
         self.CD = Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CD']
-        self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.02) * self.wingspan * self.chord_length)/9.81
+        self.drag = (Plane.air_desnsity * 0.5 * (self.cruise_velocity**2) * (self.CD + 0.2) * self.wingspan * self.chord_length)/9.81
     
     def calc_velocity(self):
         Plane.calc_mass(self)
-        self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * Plane.airfoils[self.airfoil_num].loc[1+4*self.alpha, 'CL'] * self.wingspan * self.chord_length))
+        self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * Plane.airfoils[self.airfoil_num].loc[66, 'CL'] * self.wingspan * self.chord_length))
         self.calc_drag()
         thrust = Plane.motors[self.motor_num].at[(self.throttle), 'Thrust (kg)']
         while self.drag < thrust: # if thrust from the motor is greater drag at velocity 'x'
