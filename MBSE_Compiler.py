@@ -27,8 +27,8 @@ total_range = 1
 '''Min/Max sizes'''
 min_bat = 1
 max_bat = 2
-min_wing = 0.5
-max_wing = 1
+min_wing = 0.75
+max_wing = 0.85
 battery_size = 4
 
 '''Objective Scores'''
@@ -47,9 +47,9 @@ q4= 2 #mutation rate
 
 '''Do you want plots? (1), (0)'''
 plots = 0
-export_to_VSP = 0
+export_to_VSP = 1
 export_to_flight_stream = 0
-export_to_solidworks = 1
+export_to_solidworks = 0
 
 '''Optimization'''
 true_finals = []
