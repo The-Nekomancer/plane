@@ -1,3 +1,8 @@
+'''
+PURPOSE: This file plots data of the GA, before its passed to OpenVSP
+THIS FILE IS NO LONGER NEEDED, but theres no harm in leaving it in, might be useful later
+'''
+
 import matplotlib.pyplot as plt
 from Plane_Class import Plane
 import numpy as np

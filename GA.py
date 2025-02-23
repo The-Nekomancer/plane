@@ -3,6 +3,18 @@
 Created on Fri Dec 27 13:56:06 2024
 
 @author: briggs
+
+PURPOSE: The meat and potatos
+MAIN COMPONENTS:
+- population creation
+- evaluation
+- fitness function
+- selction
+- crossover
+- population replacment
+- mutation
+
+Several plots occour afterward, but only occour is 'plots' is True, is useful for debugging GA
 """
 
 from Plane_Class import Plane
@@ -100,7 +112,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             objects[g].calc_velocity()
 
             if objects[g].lift >= objects[g].mass* 1.05:
-                i = 1#r.randint(1,3)
+                i = 1
                 if i == 1:
                     while objects[g].lift >= objects[g].mass * 1.05:
                         if objects[g].alpha >= 2:
