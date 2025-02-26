@@ -16,6 +16,10 @@ class Plane:
     '''Airfoils'''
     naca2412 = pd.read_csv('naca2412.csv')
     naca4412 = pd.read_csv('naca4412.csv')
+    
+    airfoils = ([naca2412,naca4412]) # List of airfoils that the GA chooses from
+    airfoil_codes = ["2412", "4412"] # List of airfoil codes that the GA chooses from
+
     PERC_JOUKOVSKY = pd.read_csv('12PERC JOUKOVSKY.csv')
     A_18_original = pd.read_csv('A-18 original.csv')
     A_18_smoothed = pd.read_csv('A-18 smoothed.csv')
@@ -39,7 +43,7 @@ class Plane:
     ONERA = pd.read_csv('ONERA.csv')
     PSU = pd.read_csv('PSU.csv')
     
-    airfoils = ([naca2412,naca4412])
+    
     # airfoils = ([naca2412,naca4412,PERC_JOUKOVSKY,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
     #airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
     # airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
@@ -67,7 +71,7 @@ class Plane:
 
     def __init__(self, name = "test plane",
                 wingspan = 2.540,
-                airfoil = naca2412,
+                airfoil = naca2412, 
                 airfoil_num = 0,
                 payload_mass = 0.25,
                 cruise_velocity = 15.24,

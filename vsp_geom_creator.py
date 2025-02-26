@@ -1,6 +1,17 @@
 import openvsp as vsp
 from vsp_sim import vsp_sim
+from Plane_Class import Plane
 
+#Fix hardocded values
+def parse_naca_airfoil(code):
+    if len(code) != 4 or not code.isdigit():
+        raise ValueError(f"Invalid NACA code: {code}")
+    m = int(code[0])/100.0 # 2 -> 0.02
+    p = int(code[1])/10.0 # 4 -> 0.4
+    t = int(code[2:4])/100.0 # 12 -> 0.12
+    return m, p, t
+
+# Function to create the geometry in VSP
 def vsp_geom_creator(final):
     # Create a new VSP model
     vsp.VSPRenew()
@@ -43,9 +54,15 @@ def vsp_geom_creator(final):
     # vsp.AddSubSurf(wid, "SS_CONT_0")
 
     '''Airfoil'''
-    vsp.SetParmVal( wid, "Camber", "XSecCurve_0", 0.02 )
-    vsp.SetParmVal( wid, "CamberLoc", "XSecCurve_0", 0.4 )
-    vsp.SetParmVal( wid, "ThickChord", "XSecCurve_0", 0.12 )
+    #vsp.SetParmVal( wid, "Camber", "XSecCurve_0", 0.02 )
+    #vsp.SetParmVal( wid, "CamberLoc", "XSecCurve_0", 0.4 )
+    #vsp.SetParmVal( wid, "ThickChord", "XSecCurve_0", 0.12 )
+    #vsp.Update()
+    code_str = Plane.airfoil_codes[final.airfoil_num]
+    m, p, t = parse_naca_airfoil(code_str)
+    vsp.SetParmVal( wid, "Camber", "XSecCurve_0", m )
+    vsp.SetParmVal( wid, "CamberLoc", "XSecCurve_0", p )
+    vsp.SetParmVal( wid, "ThickChord", "XSecCurve_0", t )
     vsp.Update()
 
     '''Vtail Stab'''
