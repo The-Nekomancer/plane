@@ -4,7 +4,7 @@ import pandas as pd
 # function to combine airfoil data
 def combine_airfoil_data(performance_csv, geometry_txt, output_csv):
     """
-    performance_data(CSV): "naca4412.csv", "naca2412.csv" ( Alpha, CL, CD, CDp, CM, Top_Xtr -> X, Bot_Xtr -> Y)
+    performance_data(CSV): ( Alpha, CL, CD, CDp, CM, Top_Xtr -> X, Bot_Xtr -> Y)
     geometry_data(TXT): "naca 4412.txt", "NACA 2412.txt" (x, y, z coordinates)
     output_csv: "naca4412_combined.csv", "naca2412_combined.csv"
     """
