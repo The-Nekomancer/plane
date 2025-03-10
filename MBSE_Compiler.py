@@ -9,6 +9,7 @@ PURPOSE: This is the master file that runs all other programs
 from GA import GA
 from Plane_Class import Plane
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
 from fuse_equations import fuse_equations
 import time
@@ -52,7 +53,7 @@ q4= 2 #mutation rate
 GA_plots = False
 export_to_VSP = True
 export_to_flight_stream = False
-export_to_solidworks = False
+export_to_solidworks = True
 
 '''Optimization'''
 # The 'i' for loop runs the whole GA multiple times and picks the best result of all trials, 25 is optimal
