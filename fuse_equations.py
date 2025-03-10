@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import math
+import pandas as pd
+import numpy as np
 
 def fuse_equations(final):
 
@@ -96,3 +98,31 @@ def fuse_equations(final):
         f.write('\n"battery_length"= ' + str(battery_length))
         f.write('\n"battery_width"= ' + str(battery_width))
         f.write('\n"battery_height"= ' + str(battery_height))
+
+    # identify combined airfoil CSV path
+    if final.airfoil_num == 0:
+        csv_path = "naca4412_combined.csv"
+    elif final.airfoil_num == 1:
+        csv_path = "naca2412_combined.csv"
+    else:
+        raise ValueError("Invalid airfoil number")
+
+    # Read the combined airfoil CSV
+    combined_df = pd.read_csv(csv_path)
+
+    # Filter for the Geometry rows
+    geometry_df = combined_df[combined_df["Block_Type"] == "Geometry"]
+
+    # Extract raw coordinates
+    x_raw = geometry_df["x_coord"].to_numpy()
+    y_raw = geometry_df["y_coord"].to_numpy()
+
+    # Scale the coordinates
+    x_scaled = x_raw * final.chord_length
+    y_scaled = y_raw * final.chord_length
+
+    # Write the scaled coordinates to a text file
+    with open("scaled_airfoil_coords.txt", "w") as airfoil_file:
+        for xx, yy in zip(x_scaled, y_scaled):
+            airfoil_file.write(f"{xx}, {yy}\n")
+    
