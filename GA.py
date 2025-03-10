@@ -207,7 +207,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         '''Selection'''
         score_to_beat = np.linspace(min(score), max(score), pop)
         keepers = []
-        #Keeping indivisual sizes for later use
+        #Keeping individual sizes for later use
         wings = []
         bat = []
         motors = []
