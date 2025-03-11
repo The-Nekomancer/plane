@@ -67,6 +67,6 @@ def combine_airfoil_data(performance_csv, geometry_txt, output_csv):
 
 
 if __name__ == '__main__':
-    combine_airfoil_data("naca4412.csv", "naca 4412.txt", "naca4412_combined.csv")
-    combine_airfoil_data("naca2412.csv", "NACA 2412.txt", "naca2412_combined.csv")
+    combine_airfoil_data("naca4412.csv", "naca 4412.txt", "scaled_airfoil_data/naca4412_combined.csv")
+    combine_airfoil_data("naca2412.csv", "NACA 2412.txt", "scaled_airfoil_data/naca2412_combined.csv")
     print("Combined data successfully written to CSV files!")
