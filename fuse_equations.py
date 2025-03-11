@@ -101,9 +101,9 @@ def fuse_equations(final):
 
     # identify combined airfoil CSV path
     if final.airfoil_num == 0:
-        csv_path = "naca4412_combined.csv"
+        csv_path = "scaled_airfoil_data/naca4412_combined.csv"
     elif final.airfoil_num == 1:
-        csv_path = "naca2412_combined.csv"
+        csv_path = "scaled_airfoil_data/naca2412_combined.csv"
     else:
         raise ValueError("Invalid airfoil number")
 
@@ -122,7 +122,7 @@ def fuse_equations(final):
     y_scaled = y_raw * final.chord_length
 
     # Write the scaled coordinates to a text file
-    with open("scaled_airfoil_coords.txt", "w") as airfoil_file:
+    with open("scaled_airfoil_data/scaled_airfoil_coords.txt", "w") as airfoil_file:
         for xx, yy in zip(x_scaled, y_scaled):
             airfoil_file.write(f"{xx}, {yy}\n")
     
