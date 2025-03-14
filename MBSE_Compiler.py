@@ -51,7 +51,7 @@ q4= 2 #mutation rate
 
 '''Exports (1), (0)'''
 GA_plots = False
-export_to_VSP = True
+export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
 

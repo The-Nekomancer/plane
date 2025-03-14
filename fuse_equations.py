@@ -124,5 +124,5 @@ def fuse_equations(final):
     # Write the scaled coordinates to a text file
     with open("scaled_airfoil_data/scaled_airfoil_coords.txt", "w") as airfoil_file:
         for xx, yy in zip(x_scaled, y_scaled):
-            airfoil_file.write(f"{xx}, {yy}\n")
+            airfoil_file.write(f"{xx} {yy} 0\n")
     

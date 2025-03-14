@@ -22,7 +22,7 @@
 "tail_connect_top"= 0.015750000000000004
 "wing_pos"= 0.021
 "airfoil_num"= 1
-"alpha"= 14
+"alpha"= 1.75
 "batteries"= 2
 "battery_length"= 0.076
 "battery_width"= 0.034
