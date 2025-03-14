@@ -1,0 +1,5 @@
+*.dat
+*.pkl
+*.vsp3
+Results.csv
+__pycache__/*
