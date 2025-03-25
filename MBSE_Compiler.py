@@ -21,9 +21,10 @@ priority = "low speed"
 
 '''Fitness Function Weights'''
 mass = 1
-l_over_d = 1 # this might not be used  anymore?
+l_over_d = 0 # this might not be used  anymore?
 velocity = 1
-wingspan = 1 # this might not be used  anymore?
+stall = 5
+wingspan = 3 # this might not be used  anymore?
 endurance = 1
 total_range = 1
 #Total range is only used because 'range' is a reseved word in python
@@ -31,17 +32,18 @@ total_range = 1
 '''Min/Max sizes'''
 min_bat = 1
 max_bat = 1
-min_wing = 1.130
-max_wing = 1.150
+min_wing = 0
+max_wing = 1.5
 battery_size = 1
 
 '''Objective Scores'''
 mass_obj = 1.5 #meassured in kg
 ld_obj = 50 #NOT USED but will break GA if removed
-vel_obj = 18 #m/s
-wingspan_obj = 1.5 #NOT USED but will break GA if removed
-end_obj = 0.1 #hours
-range_obj = 10 #km
+vel_obj = 25 #m/s
+stall_obj = 7 #m/s
+wingspan_obj = 1.14 #NOT USED but will break GA if removed
+end_obj = 1 #hours
+range_obj = 15 #km
 
 '''GA TWEAKING'''
 q1= 100 #population size
@@ -64,10 +66,10 @@ for p in range(1,2):
     scores = []
     errors = []
     finals = []
-    for i in range(1,2):
+    for i in range(1,6):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
-        final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat, mass,l_over_d,velocity,wingspan,endurance,total_range, GA_plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,battery_size)
+        final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat,mass,l_over_d,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
         scores.append(final.score) #These are really only for easy comparison when tweaking GA parameters
         errors.append(round(final_error,5)) #^
         finals.append(final)                #^

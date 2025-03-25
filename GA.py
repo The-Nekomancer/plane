@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # r.seed(36)
-def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,bat_cell_size):
+def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
     '''Initial Population Creation'''
     record = []
     objects = []
@@ -168,12 +168,14 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         total_mass = 0
         total_wingspan = 0
         total_vel = 0
+        total_stall = 0
         total_end = 0
         total_range = 0
         total_ld = 0
         mass_score  = []
         wingspan_score = []
         vel_score = []
+        stall_score = []
         end_score = []
         range_score = []
         ld_score = []
@@ -182,14 +184,16 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             total_mass = total_mass + (objects[j].mass)
             total_wingspan = total_wingspan + (objects[j].wingspan)
             total_vel = total_vel + objects[j].cruise_velocity
+            total_stall = total_stall + objects[j].stall_speed
             total_end = total_end + objects[j].endurance
             total_range = total_range + objects[j].range
             total_ld = total_ld + (objects[j].lift/objects[j].drag)
         for u in range(pop):
             mass_score.append(abs(mass_obj - objects[u].mass)/mass_obj)
-            #ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
+            ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
             ld_score.append(abs(ld_obj - (Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CL']/Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CD']))/ld_obj)
             vel_score.append(abs(vel_obj - objects[u].cruise_velocity)/vel_obj)
+            stall_score.append(abs(stall_obj - objects[u].stall_speed)/stall_obj)
             wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)
             end_score.append(abs(end_obj - objects[u].endurance)/end_obj)
             range_score.append(abs(range_obj - objects[u].range)/range_obj)
@@ -200,9 +204,9 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         score = []
         for k in range(pop):
             
-            # score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
+            score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]) + (G)*(1-stall_score[k]))
             '''Score without L/D'''
-            score.append((A)*(1-mass_score[k]) + (C)*(1-vel_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
+            #score.append((A)*(1-mass_score[k]) + (C)*(1-vel_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
 
         '''Selection'''
         score_to_beat = np.linspace(min(score), max(score), pop)
