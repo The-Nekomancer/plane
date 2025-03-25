@@ -12,7 +12,7 @@ def combine_airfoil_data(performance_csv, geometry_txt, output_csv):
     # Load performance csv file
     performance_df = pd.read_csv(performance_csv)
 
-     # Check for columns that Xtr and Ytr are in the dataframe
+    # Check for columns that Xtr and Ytr are in the dataframe
     cols = performance_df.columns
     if "Top_Xtr" in cols and "Bot_Xtr" in cols:
         # Rename Top_Xtr and Bot_Xtr to X and Y

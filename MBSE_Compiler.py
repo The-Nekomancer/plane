@@ -22,7 +22,7 @@ priority = "low speed"
 '''Fitness Function Weights'''
 mass = 1
 l_over_d = 1 # this might not be used  anymore?
-velocity = 10
+velocity = 1
 wingspan = 1 # this might not be used  anymore?
 endurance = 1
 total_range = 1
@@ -30,18 +30,18 @@ total_range = 1
 
 '''Min/Max sizes'''
 min_bat = 1
-max_bat = 2
-min_wing = 0.75
-max_wing = 0.85
-battery_size = 4
+max_bat = 1
+min_wing = 1.130
+max_wing = 1.150
+battery_size = 1
 
 '''Objective Scores'''
 mass_obj = 1.5 #meassured in kg
 ld_obj = 50 #NOT USED but will break GA if removed
-vel_obj = 25 #m/s
+vel_obj = 18 #m/s
 wingspan_obj = 1.5 #NOT USED but will break GA if removed
-end_obj = 1 #hours
-range_obj = 25 #km
+end_obj = 0.1 #hours
+range_obj = 10 #km
 
 '''GA TWEAKING'''
 q1= 100 #population size
