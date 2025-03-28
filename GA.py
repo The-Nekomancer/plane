@@ -25,7 +25,7 @@ import pandas as pd
 from instance_update import *
 
 # r.seed(36)
-def GA(max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
+def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
     '''Initial Population Creation'''
     record = []
     objects = []
@@ -58,7 +58,7 @@ def GA(max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_
         airfoil_num = r.randint(0, len(Plane.airfoils)-1)
         airfoil = Plane.airfoils[airfoil_num]
         bat = Plane.batts[2]
-        obj = Plane(wingspan=wing,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num,airfoil_num=airfoil_num,airfoil=airfoil)
+        obj = Plane(payload_mass=payload,wingspan=wing,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num,airfoil_num=airfoil_num,airfoil=airfoil)
         objects.append(obj)
         pure.append(obj)
         record.append(obj)
@@ -159,7 +159,7 @@ def GA(max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_
             airfoil = airfoils[airfoil_sel]
             airfoil_num = airfoil_nums[airfoil_sel]
 
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
+            obj = Plane(payload_mass=payload,wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
             crossover.append(obj)
             objects.append(obj)
 
@@ -175,7 +175,7 @@ def GA(max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_
             airfoil_num = keepers[airfoil_sel].airfoil_num
             alpha = keepers[r.randint(0, len(keepers)-1)].alpha
             throttle = keepers[r.randint(0, len(keepers)-1)].throttle
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
+            obj = Plane(payload_mass=payload,wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
             objects.append(obj) 
             record.append(obj)
             pure.append(obj)
@@ -276,7 +276,7 @@ def GA(max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_
     final_airfoil = pure[-1].airfoil
     final_airfoil_num = pure[-1].airfoil_num
     final_throttle = pure[-1].throttle
-    final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,motor_num=final_motor_num,alpha=final_alpha,airfoil=final_airfoil,airfoil_num=final_airfoil_num,throttle=final_throttle)
+    final = Plane(payload_mass=payload, wingspan=final_wing,batteries=final_bat,motor=final_motor,motor_num=final_motor_num,alpha=final_alpha,airfoil=final_airfoil,airfoil_num=final_airfoil_num,throttle=final_throttle)
     final.wingspan = round(final.wingspan,3)
     final.chord_length = round(final.chord_length,3)
     final.fuse_diam = round(final.fuse_diam,3)

@@ -23,19 +23,20 @@ priority = "low speed"
 mass = 1
 velocity = 1
 stall = 5
-wingspan = 3 # this might not be used  anymore?
+wingspan = 3
 endurance = 1
 total_range = 1
 #Total range is only used because 'range' is a reseved word in python
 
-'''Min/Max sizes'''
+'''sizing'''
 min_bat = 1
 max_bat = 1
-max_wing = 1.5
+max_wing = 1.5 # meters
 battery_size = 1
+payload_weight = 0.25 # kg
 
 '''Objective Scores'''
-mass_obj = 1.5 #meassured in kg
+mass_obj = 1.5 # kg
 vel_obj = 25 #m/s
 stall_obj = 7 #m/s
 wingspan_obj = 1.14
@@ -66,7 +67,7 @@ for p in range(1,2):
     for i in range(1,6):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
-        final, record, objects, final_error = GA(max_wing,max_bat,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
+        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
         scores.append(final.score) #These are really only for easy comparison when tweaking GA parameters
         errors.append(round(final_error,5)) #^
         finals.append(final)                #^
