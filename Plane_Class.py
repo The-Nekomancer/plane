@@ -123,15 +123,15 @@ class Plane:
         #########CALCULATION METHODS###########################################
     def calc_mass(self):
         bat_skid_mass = self.batteries * self.bat["mass"]
-        elec_skid_mass = 0.3
+        elec_skid_mass = 0.13
         # Surface area calculated is equal to the surface area of a clyinder with one end being a sphere
         self.fuse_surf_area = 2*np.pi*(self.fuse_diam/2) + self.fuse_length + np.pi*(self.fuse_diam/2)**2 + 2*np.pi*(self.fuse_diam/2)**2
-        self.fuse_mass = self.fuse_surf_area * 0.2
-        self.wing_mass = self.wingspan * self.chord_length * 2 *.2
-        self.tail_mass = 0.004 * 3 * self.tail_length * .2
-        self.vtail_mass = 2 * self.vtail_length * 0.2
-        motor_mass = 0.4 #<----- Hard coded but it shouldn't be
-        self.mass = bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass + motor_mass
+        self.fuse_mass = round(self.fuse_surf_area * 0.002 * 250,4)
+        self.wing_mass = round(self.wingspan * self.chord_length *0.002 * 550,4)
+        self.tail_mass = round(self.tail_length * 0.001 * 100,4)
+        self.vtail_mass = round(2 * self.vtail_length * self.vtail_chord * 0.002 * 3000,4)
+        motor_mass = 0.04 #<----- Hard coded but it shouldn't be
+        self.mass = round(bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass + motor_mass,4)
         self.center_of_gravity = round(self.fuse_length * 0.33,2) #<---------- This is shouldn't be calculated this way, must change later
         self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2 #Vertical position relative to fuselage
         
