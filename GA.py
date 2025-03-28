@@ -25,7 +25,7 @@ import pandas as pd
 from instance_update import *
 
 # r.seed(36)
-def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
+def GA(max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
     '''Initial Population Creation'''
     record = []
     objects = []
@@ -49,8 +49,8 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_ob
             usable_bats.append(Plane.batts[q])
     
     for i in range(pop):
-        wing= r.uniform(min_wing,max_wing)
-        batteries = r.randint(min_bat, max_bat)
+        wing= r.uniform(0,max_wing)
+        batteries = r.randint(1, max_bat)
         motor_num = r.randint(0, len(Plane.motors)-1)
         motor = Plane.motors[motor_num]
         throttle = r.randint(1,4)
@@ -97,8 +97,6 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_ob
             total_ld = total_ld + (objects[j].lift/objects[j].drag)
         for u in range(pop):
             mass_score.append(abs(mass_obj - objects[u].mass)/mass_obj)
-            ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
-            ld_score.append(abs(ld_obj - (Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CL']/Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CD']))/ld_obj)
             vel_score.append(abs(vel_obj - objects[u].cruise_velocity)/vel_obj)
             stall_score.append(abs(stall_obj - objects[u].stall_speed)/stall_obj)
             wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)
@@ -111,9 +109,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_ob
         score = []
         for k in range(pop):
             
-            score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]) + (G)*(1-stall_score[k]))
-            '''Score without L/D'''
-            #score.append((A)*(1-mass_score[k]) + (C)*(1-vel_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
+            score.append((A)*(1-mass_score[k]) + (B)*(1-vel_score[k]) + (C)*(1-wingspan_score[k]) + (D)*(1-end_score[k]) + (E)*(1-range_score[k]) + (F)*(1-stall_score[k]))
 
         '''Selection'''
         score_to_beat = np.linspace(min(score), max(score), pop)
@@ -188,8 +184,8 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_ob
         mutants = []
         for u in range(len(objects)):
             if r.uniform(0, 100) >= (100 - mutation_rate):
-                objects[u].wingspan = r.uniform(1, 3)
-                objects[u].batteries = r.randint(1, 4)
+                objects[u].wingspan = r.uniform(0, max_wing)
+                objects[u].batteries = r.randint(1, max_bat)
                 moto = r.randint(0, len(keepers)-1)
                 objects[u].motor_num = keepers[moto].motor_num
                 objects[u].motor = keepers[moto].motor
@@ -290,17 +286,13 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,G,plots,q1,q2,q3,q4,mass_ob
     
     # Final score is calculated
     mass_score = (abs(mass_obj - final.mass)/mass_obj)
-    ld_score = (abs(ld_obj - (final.CL/final.CD))/ld_obj)
     vel_score = (abs(vel_obj - final.cruise_velocity)/vel_obj)
     wingspan_score = (abs(wingspan_obj - final.wingspan)/wingspan_obj)
     end_score = (abs(end_obj - final.endurance)/end_obj)
     range_score = (abs(range_obj - final.range)/range_obj)
     stall_score = (abs(stall_obj - final.stall_speed)/stall_obj)
-    final.score = ((A)*(1-mass_score) + (B)*(1-ld_score) + (C)*(1-vel_score) + (D)*(1-wingspan_score) + (E)*(1-end_score) + (F)*(1-range_score) +(G)*(1-stall_score))
-    final_error = ((A+B+C+D+E+F+G - final.score)/(A+B+C+D+E+F+G))*100
-    '''no wingspan or L/D'''
-    # final.score = ((C)*(1-vel_score) + (E)*(1-end_score) + (F)*(1-range_score))
-    # final_error = ((C+E+F - final.score)/(C+E+F))*100
+    final.score = ((A)*(1-mass_score) + (B)*(1-vel_score) + (C)*(1-wingspan_score) + (D)*(1-end_score) + (E)*(1-range_score) +(F)*(1-stall_score))
+    final_error = ((A+B+C+D+E+F - final.score)/(A+B+C+D+E+F))*100
 
     if final.score <= 0:
         plots = 0
