@@ -26,10 +26,8 @@ stall = 5
 wingspan = 3
 endurance = 1
 total_range = 1
-#Total range is only used because 'range' is a reseved word in python
 
 '''sizing'''
-min_bat = 1
 max_bat = 1
 max_wing = 1.5 # meters
 battery_size = 1
@@ -39,7 +37,7 @@ payload_weight = 0.25 # kg
 mass_obj = 1.5 # kg
 vel_obj = 25 #m/s
 stall_obj = 7 #m/s
-wingspan_obj = 1.14
+wingspan_obj = 1.1 #meters
 end_obj = 1 #hours
 range_obj = 15 #km
 
