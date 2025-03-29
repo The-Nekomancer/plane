@@ -281,6 +281,14 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
     final.chord_length = round(final.chord_length,3)
     final.fuse_diam = round(final.fuse_diam,3)
     final.fuse_length = round(final.fuse_length,3)
+
+    '''CG Calc'''
+    # final.cg_check()
+    # while final.cg_check == False:
+    #     # final.fuse_length = final.fuse_length*1.01
+    #     final.tail_length = final.tail_length * 1.01
+    #     final.cg_check
+    
     # Properites are calculated
     final = instance_update(final)
     

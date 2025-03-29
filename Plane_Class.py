@@ -122,8 +122,8 @@ class Plane:
         """
         #########CALCULATION METHODS###########################################
     def calc_mass(self):
-        bat_skid_mass = self.batteries * self.bat["mass"]
-        elec_skid_mass = 0.13
+        self.bat_skid_mass = self.batteries * self.bat["mass"]
+        self.elec_skid_mass = 0.13
         # Surface area calculated is equal to the surface area of a clyinder with one end being a sphere
         self.fuse_surf_area = 2*np.pi*(self.fuse_diam/2) + self.fuse_length + np.pi*(self.fuse_diam/2)**2 + 2*np.pi*(self.fuse_diam/2)**2
         self.fuse_mass = round(self.fuse_surf_area * 0.002 * 250,4)
@@ -131,9 +131,28 @@ class Plane:
         self.tail_mass = round(self.tail_length * 0.001 * 100,4)
         self.vtail_mass = round(2 * self.vtail_length * self.vtail_chord * 0.002 * 3000,4)
         motor_mass = 0.04 #<----- Hard coded but it shouldn't be
-        self.mass = round(bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass + motor_mass,4)
+        self.mass = round(self.bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + self.elec_skid_mass + motor_mass,4)
         self.center_of_gravity = round(self.fuse_length * 0.33,2) #<---------- This is shouldn't be calculated this way, must change later
         self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2 #Vertical position relative to fuselage
+
+    def cg_check(self):
+        Plane.calc_mass(self)
+        '''Front of Plane'''
+        fuse_moment = self.fuse_mass*(self.fuse_length-self.chord_length)/2 
+        payload_moment = self.payload_mass * (self.fuse_length-self.chord_length)
+        forward_moment = fuse_moment + payload_moment
+        '''Rear of Plane'''
+        motor_moment = 0.034*self.tail_length
+        rudder_moment = self.vtail_mass * self.tail_length
+        rear_moment = motor_moment + rudder_moment
+        '''Battery Moments'''
+        if (rear_moment - forward_moment*1.1) > 0:
+            if (rear_moment - (forward_moment + self.bat_skid_mass*((self.fuse_length-self.chord_length)/2 ))*1.1) < 0:
+                self.cg_check = True
+            else:
+                self.cg_check = False
+        else:
+            self.cg_check = False
         
     def calc_endurance(self):
         amps = Plane.motors[self.motor_num].loc[(self.throttle), 'Current (A)']
