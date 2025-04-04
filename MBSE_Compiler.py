@@ -24,6 +24,7 @@ import pickle as pkl
     - LW-PLA
     - Carbon Fiber
     - Fiber Glass
+- Multi motor Support
 '''
 
 priority = "low speed"
@@ -32,24 +33,24 @@ priority = "low speed"
 '''Fitness Function Weights'''
 mass = 1
 velocity = 1
-stall = 5
-wingspan = 3
+stall = 1
+wingspan = 1
 endurance = 1
 total_range = 1
 
 '''sizing'''
-max_bat = 1
-max_wing = 1.5 # meters
+max_bat = 4
+max_wing = 3 # meters
 battery_size = 1
-payload_weight = 0.25 # kg
+payload_weight = 1 # kg
 
 '''Objective Scores'''
-mass_obj = 1.5 # kg
-vel_obj = 25 #m/s
-stall_obj = 7 #m/s
-wingspan_obj = 1.1 #meters
-end_obj = 1 #hours
-range_obj = 15 #km
+mass_obj = 15 # kg
+vel_obj = 20 #m/s
+stall_obj = 12 #m/s
+wingspan_obj = 2 #meters
+end_obj = 3 #hours
+range_obj = 100 #km
 
 '''GA TWEAKING'''
 q1= 100 #population size
@@ -58,7 +59,7 @@ q3= 0.05 #keepers
 q4= 2 #mutation rate
 
 '''Exports (1), (0)'''
-GA_plots = False
+GA_plots = True
 export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
@@ -72,7 +73,7 @@ for p in range(1,2):
     scores = []
     errors = []
     finals = []
-    for i in range(1,6):
+    for i in range(1,2):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
         final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
@@ -112,28 +113,27 @@ if export_to_solidworks == True:
 
 '''Print data'''
 # The following is just an easy readout to confirm the results
-print(f"fuselage diameter: {str(final.fuse_diam)}")
-print(f"fuselage length: {str(final.fuse_length)}")
-print(f"chord length: {str(final.chord_length)}")
-print(f"Wingspan: {str(final.wingspan)}")
+print(f"Fuselage diameter: {str(final.fuse_diam)}" + " m")
+print(f"Fuselage length: {str(final.fuse_length)}"+ " m")
+print(f"Chord length: {str(final.chord_length)}"+ " m")
+print(f"Wingspan: {str(final.wingspan)}"+ " m")
 print(f"Number of Batteries: {str(final.batteries)}")
-print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)']))
+print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)'])+ " %")
 print(f"Motor: {str(final.motor_num)}")
-print(f"Velocity: {str(final.cruise_velocity)}")
-print(f"Stall Speed: {str(final.stall_speed)}")
-print(f"final score: {str(final.score)}")
-print(f"final lift: {str(final.lift)}")
-print(f"final mass: {str(final.mass)}")
-print(f"final alpha: {str(final.alpha)}")
-print(f"final endurance: {str(final.endurance)}")
-print(f"final range: {str(final.range)}")
-print("final current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']))
+print(f"Velocity: {str(final.cruise_velocity)}"+ " m/s")
+print(f"Stall Speed: {str(round(final.stall_speed,2))}"+ " m/s")
+print(f"Score: {str(round(final.score,2))}")
+print(f"Lift: {str(round(final.lift,2))}"+ " kg")
+print(f"Mass: {str(round(final.mass,2))}"+ " kg")
+print(f"Alpha: {str(final.alpha)}"+ " degrees")
+print(f"Endurance: {str(round(final.endurance,2))}"+ " hours")
+print(f"Range: {str(round(final.range,2))}"+ " km")
+print("Current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)'])+ " A")
 print(f"airfoil: {str(final.airfoil_num)}")
-
-print(f"final mass: {str(final.mass)}")
-print(f"fuse mass: {str(final.fuse_mass)}")
-print(f"wing mass: {str(final.wing_mass)}")
-print(f"tail mass: {str(final.tail_mass)}")
-print(f"final tail length: {str(final.tail_length)}")
-print(f"final vtail length: {str(final.vtail_length)}")
-print(f"ruddervator mass: {str(final.vtail_mass)}")
+# print(f"final mass: {str(final.mass)}")
+print(f"Fuselage mass: {str(final.fuse_mass)}"+ " kg")
+print(f"Wing mass: {str(final.wing_mass)}"+ " kg")
+print(f"Tail mass: {str(final.tail_mass)}"+ " kg")
+print(f"Tail length: {str(final.tail_length)}"+ " m")
+# print(f"vtail length: {str(final.vtail_length)}")
+print(f"Ruddervator mass: {str(final.vtail_mass)}"+ " kg")

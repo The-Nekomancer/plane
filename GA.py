@@ -49,7 +49,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
             usable_bats.append(Plane.batts[q])
     
     for i in range(pop):
-        wing= r.uniform(0,max_wing)
+        wing= r.uniform((max_wing * 0.25),max_wing)
         batteries = r.randint(1, max_bat)
         motor_num = r.randint(0, len(Plane.motors)-1)
         motor = Plane.motors[motor_num]
@@ -184,7 +184,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         mutants = []
         for u in range(len(objects)):
             if r.uniform(0, 100) >= (100 - mutation_rate):
-                objects[u].wingspan = r.uniform(0, max_wing)
+                objects[u].wingspan = r.uniform((max_wing * 0.25), max_wing)
                 objects[u].batteries = r.randint(1, max_bat)
                 moto = r.randint(0, len(keepers)-1)
                 objects[u].motor_num = keepers[moto].motor_num
@@ -313,7 +313,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         plt.scatter(mutants_list ,mutant_wing, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Wingspan")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Meters")
         plt.show()
         '''velocity'''
@@ -322,7 +322,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         plt.scatter(mutants_list ,mutant_vel, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Cruise Velocity")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Meters/Second")
         plt.show()
         '''mass'''
@@ -331,7 +331,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         plt.scatter(mutants_list ,mutant_mass, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Mass")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Kg")
         plt.show()
         '''endurance'''
@@ -340,7 +340,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         plt.scatter(mutants_list ,mutant_end, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Endurance")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Hours")
         plt.show()
         '''range'''
@@ -349,7 +349,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         plt.scatter(mutants_list ,mutant_range, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Range")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Km")
         plt.show()
         '''lift'''
@@ -358,7 +358,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
         plt.scatter(mutants_list ,mutant_lift, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Lift")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Kg (converted from N)")
         plt.show()
         '''Endurance and Range'''
@@ -393,7 +393,7 @@ def GA(payload,max_wing,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,w
 
         fig = plt.figure(10)
         plt.plot(range(len(keepers_score)), keepers_score)
-        plt.xlabel("Interations kept")
+        plt.xlabel("Instances kept")
         plt.ylabel("score")
         plt.title("Scores over time")
         plt.show()

@@ -57,8 +57,8 @@ class Plane:
     v10l_kv170 = pd.read_csv('V10L_KV170.csv')
     U8II = pd.read_csv('U8II.csv')
     f60pro4 = pd.read_csv('f60pro4.csv')
-    # motors = ([v602_kv180, v10l_kv170, U8II, f60pro4])
-    motors = ([f60pro4])
+    motors = ([v602_kv180, v10l_kv170, f60pro4])
+    #motors = ([f60pro4])
     '''Batteries'''
     bat_8000_6s = {"cells": 6,"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     bat_2200_4s = {"cells": 4,"capacity": 2200, "mass": 0.1786, "length": 0.1016, "width": 0.04572, "height": 0.04572}
@@ -130,7 +130,7 @@ class Plane:
         self.wing_mass = round(self.wingspan * self.chord_length *0.002 * 550,4)
         self.tail_mass = round(self.tail_length * 0.001 * 100,4)
         self.vtail_mass = round(2 * self.vtail_length * self.vtail_chord * 0.002 * 3000,4)
-        motor_mass = 0.04 #<----- Hard coded but it shouldn't be
+        motor_mass = 0.036 #<----- Hard coded but it shouldn't be
         self.mass = round(self.bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + self.elec_skid_mass + motor_mass,4)
         self.center_of_gravity = round(self.fuse_length * 0.33,2) #<---------- This is shouldn't be calculated this way, must change later
         self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2 #Vertical position relative to fuselage

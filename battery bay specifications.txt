@@ -6,7 +6,7 @@
 "bat_bay_length"= 0.096
 "wing_shelf"= 0.02125
 "shell"= 0.002
-"chord_length"= 0.229
-"tail_length"= 0.45276000000000005
+"chord_length"= 0.297
+"tail_length"= 0.58773
 "tail_diam"= 0.0425
-"connector"= 0.11319000000000001
+"connector"= 0.1469325
