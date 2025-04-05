@@ -41,6 +41,7 @@ total_range = 1
 '''sizing'''
 max_bat = 4
 max_wing = 3 # meters
+max_motors = 1
 battery_size = 1
 payload_weight = 1 # kg
 
@@ -59,7 +60,7 @@ q3= 0.05 #keepers
 q4= 2 #mutation rate
 
 '''Exports (1), (0)'''
-GA_plots = True
+GA_plots = False
 export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
@@ -76,7 +77,7 @@ for p in range(1,2):
     for i in range(1,2):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
-        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
+        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,max_motors,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
         scores.append(final.score) #These are really only for easy comparison when tweaking GA parameters
         errors.append(round(final_error,5)) #^
         finals.append(final)                #^
@@ -120,7 +121,7 @@ print(f"Wingspan: {str(final.wingspan)}"+ " m")
 print(f"Number of Batteries: {str(final.batteries)}")
 print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)'])+ " %")
 print(f"Motor: {str(final.motor_num)}")
-print(f"Velocity: {str(final.cruise_velocity)}"+ " m/s")
+print(f"Velocity: {str(round(final.cruise_velocity,3))}"+ " m/s")
 print(f"Stall Speed: {str(round(final.stall_speed,2))}"+ " m/s")
 print(f"Score: {str(round(final.score,2))}")
 print(f"Lift: {str(round(final.lift,2))}"+ " kg")
