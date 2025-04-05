@@ -43,7 +43,6 @@ class Plane:
     ONERA = pd.read_csv('ONERA.csv')
     PSU = pd.read_csv('PSU.csv')
     
-    
     # airfoils = ([naca2412,naca4412,PERC_JOUKOVSKY,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
     #airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
     # airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
@@ -166,8 +165,7 @@ class Plane:
     def calc_range(self):
         self.calc_endurance()
         self.calc_velocity()
-        self.range = self.endurance * self.cruise_velocity * 60**2/1000
-        # km
+        self.range = self.endurance * self.cruise_velocity * 60**2/1000 # km
     
     def calc_lift(self):
         self.CL = Plane.airfoils[self.airfoil_num].loc[4*self.alpha, 'CL'] # airfoil data is always deliniated in 0.25 degrees of alpha so it's multiplied by 4 for loacation of data

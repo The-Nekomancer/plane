@@ -292,7 +292,13 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
         if final.cg_correction == 'tail heavy':
             final.fuse_length = final.fuse_length*1.01
         if final.cg_correction == 'nose heavy':
-            final.tail_length = final.tail_length * 1.01
+            if final.fuse_length > 0.1:
+                final.fuse_length = final.fuse_length*0.99
+            elif final.batteries > 1:
+                final.batteries = final.batteries -1
+            else:
+                print("Conduct addiaional calculations for the cg, likely unstable")
+                break
         final.cg_checker()
     print(final.cg_check)
     final.fuse_diam = round(final.fuse_diam,3)

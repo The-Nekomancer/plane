@@ -17,14 +17,13 @@ from performance_plotter import performance_plotter
 import pickle as pkl
 
 '''TO DO LIST
-- Fix CG check
+- battery selection
 - Export to SolidWorks automatically
 - Add material selection
     - PETG
     - LW-PLA
     - Carbon Fiber
     - Fiber Glass
-- Multi motor Support
 '''
 
 priority = "low speed"
