@@ -43,7 +43,6 @@ class Plane:
     ONERA = pd.read_csv('ONERA.csv')
     PSU = pd.read_csv('PSU.csv')
     
-    
     # airfoils = ([naca2412,naca4412,PERC_JOUKOVSKY,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
     #airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,PSU])
     # airfoils = ([naca2412,naca4412,A_18_original,B_29,B_29_TIP,DAE_11,DEFIANT_CANARD,e169,EPPLER_1211,FAGEANDCOLLINS,GIII,GM15,GRUMMAN,HUGHES,ISA,JOUKOVSKY,K3311,LOCKHEED_C_5,LOCKHEED_C_141,OA213,ONERA,PSU])
@@ -57,29 +56,25 @@ class Plane:
     v10l_kv170 = pd.read_csv('V10L_KV170.csv')
     U8II = pd.read_csv('U8II.csv')
     f60pro4 = pd.read_csv('f60pro4.csv')
-    motors = ([v602_kv180, v10l_kv170, U8II, f60pro4])
-    
+    motors = ([v602_kv180, v10l_kv170, f60pro4])
+    #motors = ([f60pro4])
     '''Batteries'''
     bat_8000_6s = {"cells": 6,"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     bat_2200_4s = {"cells": 4,"capacity": 2200, "mass": 0.1786, "length": 0.1016, "width": 0.04572, "height": 0.04572}
     bat_1350_6s = {"cells": 6,"capacity": 1350, "mass": 0.259, "length": 0.076, "width": 0.034, "height": 0.051}
     batts = ([bat_8000_6s,bat_2200_4s,bat_1350_6s])
-    
-    # priority = {"Low Speed", "High Speed", "Range", "Lift", "Endurance"}
-    priority = [1,2,3,4,5] 
-    # Relic that breaks GA if commented out, need to remove eventually
 
     def __init__(self, name = "test plane",
                 wingspan = 2.540,
                 airfoil = naca2412, 
                 airfoil_num = 0,
-                payload_mass = 0.25,
+                payload_mass = 0.286,
                 cruise_velocity = 15.24,
-                priority = priority[0],
-                motor = motors[3],
+                motor = motors[0],
+                motors = 1,
                 bat = batts[2],
                 batteries = 2,
-                fuse_diam = 0.07,
+                fuse_diam = 0.085,
                 fuse_length = .25,
                 payload_skid_width = .1,
                 payload_skid_length = .15,
@@ -87,17 +82,18 @@ class Plane:
                 alpha = 5,
                 throttle = 3,
                 motor_num = 0,
+                config = 'VTail',
                 score = 0):
         self.name = name
         self.wingspan = wingspan
-        self.chord_length = wingspan/9
+        self.chord_length = wingspan/6
         self.airfoil = airfoil
         self.airfoil_num = airfoil_num
         self.payload_mass = payload_mass
         self.cruise_velocity =  cruise_velocity
         self.mass = payload_mass*3
-        self.priority = priority
-        self.motor  = motor
+        self.motor  = motor #The actaul motor used
+        self.motors = motors #The number of motors used
         self.fuse_diam = fuse_diam
         self.fuse_length = fuse_length
         self.bat = bat
@@ -122,21 +118,46 @@ class Plane:
         """
         #########CALCULATION METHODS###########################################
     def calc_mass(self):
-        bat_skid_mass = self.batteries * self.bat["mass"]
-        elec_skid_mass = 0.3
+        self.bat_skid_mass = self.batteries * self.bat["mass"]
+        self.elec_skid_mass = 0.13
         # Surface area calculated is equal to the surface area of a clyinder with one end being a sphere
         self.fuse_surf_area = 2*np.pi*(self.fuse_diam/2) + self.fuse_length + np.pi*(self.fuse_diam/2)**2 + 2*np.pi*(self.fuse_diam/2)**2
-        self.fuse_mass = self.fuse_surf_area * 0.2
-        self.wing_mass = self.wingspan * self.chord_length * 2 *.2
-        self.tail_mass = 0.004 * 3 * self.tail_length * .2
-        self.vtail_mass = 2 * self.vtail_length * 0.2
-        motor_mass = 0.4 #<----- Hard coded but it shouldn't be
-        self.mass = bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + elec_skid_mass + motor_mass
+        self.fuse_mass = round(self.fuse_surf_area * 0.002 * 250,4)
+        self.wing_mass = round(self.wingspan * self.chord_length *0.002 * 550,4)
+        self.tail_mass = round(self.tail_length * 0.001 * 100,4)
+        self.vtail_mass = round(2 * self.vtail_length * self.vtail_chord * 0.002 * 3000,4)
+        motor_mass = Plane.motors[self.motor_num].loc[2, 'mass'] * self.motors
+        self.mass = round(self.bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + self.elec_skid_mass + motor_mass,4)
         self.center_of_gravity = round(self.fuse_length * 0.33,2) #<---------- This is shouldn't be calculated this way, must change later
         self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2 #Vertical position relative to fuselage
+
+    def cg_checker(self):
+        self.calc_mass()
+        '''Front of Plane'''
+        fuse_moment = self.fuse_mass*(self.fuse_length-self.chord_length)/2 
+        payload_moment = self.payload_mass * (self.fuse_length-self.chord_length)
+        forward_moment = fuse_moment + payload_moment
+        '''Motor'''
+        if self.motors % 2 == 1:
+            motor_moment = 0.034*self.tail_length
+        else:
+            motor_moment = 0
+        '''Rear of Plane'''
+        rudder_moment = self.vtail_mass * self.tail_length
+        rear_moment = motor_moment + rudder_moment
+        '''Battery Moments'''
+        if rear_moment > forward_moment*1.1:
+            if (rear_moment < (forward_moment + self.bat_skid_mass*((self.fuse_length-self.chord_length)/2 ))*1.1):
+                self.cg_check = True
+            else:
+                self.cg_check = False
+                self.cg_correction = 'tail heavy'
+        else:
+            self.cg_check = False
+            self.cg_correction = 'nose heavy'
         
     def calc_endurance(self):
-        amps = Plane.motors[self.motor_num].loc[(self.throttle), 'Current (A)']
+        amps = Plane.motors[self.motor_num].loc[(self.throttle), 'Current (A)'] * self.motors
         self.capacity = self.bat["capacity"] * self.batteries / 1000
         self.endurance = self.capacity/amps
         #defined in hours
@@ -144,8 +165,7 @@ class Plane:
     def calc_range(self):
         self.calc_endurance()
         self.calc_velocity()
-        self.range = self.endurance * self.cruise_velocity * 60**2/1000
-        # km
+        self.range = self.endurance * self.cruise_velocity * 60**2/1000 # km
     
     def calc_lift(self):
         self.CL = Plane.airfoils[self.airfoil_num].loc[4*self.alpha, 'CL'] # airfoil data is always deliniated in 0.25 degrees of alpha so it's multiplied by 4 for loacation of data
@@ -168,7 +188,7 @@ class Plane:
         Plane.calc_mass(self)
         self.stall_speed = np.sqrt(2*9.81*self.mass/(Plane.air_desnsity * Plane.airfoils[self.airfoil_num].loc[66, 'CL'] * self.wingspan * self.chord_length))
         self.calc_drag()
-        thrust = Plane.motors[self.motor_num].at[(self.throttle), 'Thrust (kg)']
+        thrust = Plane.motors[self.motor_num].at[(self.throttle), 'Thrust (kg)'] * self.motors
         while self.drag < thrust: # if thrust from the motor is greater drag at velocity 'x'
             self.cruise_velocity = self.cruise_velocity * 1.001
             self.calc_drag()
@@ -197,47 +217,4 @@ class Plane:
         self.fuse_length = self.payload_skid_length + self.bat_skid_length
         self.nose_cone_length = self.fuse_length * 0.25
         Plane.calc_mass(self)
-        
-    def motor_sizing(self):
-        Plane.calc_drag(self)
-        Plane.calc_velocity(self)
-        if self.stall_speed > self.cruise_velocity:
-            motor_index = Plane.motors.index((self.motor))
-            self.motor = Plane.motors[motor_index + 1]
-        
-    def wing_sizing(self):
-        Plane.calc_lift(self)
-        Plane.calc_mass(self)
-        Plane.calc_velocity(self)
-        self.weight = self.mass * 1 #lift is calculated in kg
-        if self.priority == 2:
-            while self.weight < self.lift:
-                if self.wingspan < self.min_wingspan:
-                    break
-                else:
-                    self.wingspan = self.wingspan * 0.999
-                    self.chord_length = self.chord_length * 0.999
-                    Plane.calc_lift(self)
-        if self.priority == 1:
-            while self.cruise_velocity > self.max_vel:
-                if self.max_wingspan < self.wingspan:
-                    break
-                else:
-                    self.wingspan = self.wingspan * 1.001
-                    self.chord_length = self.chord_length * 1.001
-                    Plane.calc_lift(self)
-                    Plane.calc_velocity(self)
-    
-    def tail_sizing(self):
-        Plane.calc_lift(self)
-        Plane.calc_vtail_lift(self)
-        while self.vtail_moment > self.moment:
-            self.tail_length = self.tail_length * 1.01
-            Plane.calc_vtail_lift(self)
-            
-    def vel_setting(self):
-        if self.priority == 1:
-            while self.mass < self.lift:
-                self.cruise_velocity = self.cruise_velocity * 0.99
-                Plane.calc_lift(self)
                 

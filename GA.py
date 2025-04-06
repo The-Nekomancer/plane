@@ -22,9 +22,10 @@ import numpy as np
 import random as r
 import matplotlib.pyplot as plt
 import pandas as pd
+from instance_update import *
 
 # r.seed(36)
-def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,bat_cell_size):
+def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
     '''Initial Population Creation'''
     record = []
     objects = []
@@ -48,119 +49,27 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             usable_bats.append(Plane.batts[q])
     
     for i in range(pop):
-        wing= r.uniform(min_wing,max_wing)
-        batteries = r.randint(min_bat, max_bat)
+        wing= r.uniform((max_wing * 0.25),max_wing)
+        batteries = r.randint(1, max_bat)
         motor_num = r.randint(0, len(Plane.motors)-1)
         motor = Plane.motors[motor_num]
+        motors = r.randint(1, max_motors)
         throttle = r.randint(1,4)
         alpha = r.randint(0,36)/4
         airfoil_num = r.randint(0, len(Plane.airfoils)-1)
         airfoil = Plane.airfoils[airfoil_num]
         bat = Plane.batts[2]
-        obj = Plane(wingspan=wing,batteries=batteries,motor=motor,alpha=alpha,throttle=throttle,motor_num=motor_num,airfoil_num=airfoil_num,airfoil=airfoil)
+        obj = Plane(payload_mass=payload,wingspan=wing,batteries=batteries,motor=motor,motors=motors,alpha=alpha,throttle=throttle,motor_num=motor_num,airfoil_num=airfoil_num,airfoil=airfoil)
         objects.append(obj)
         pure.append(obj)
         record.append(obj)
 
     '''GA LOOP'''
     e = 1
-    while e < iteration_limit:     
+    while e < iteration_limit: 
+        print(e)    
         for g in range(pop):
-            objects[g].calc_mass()
-            objects[g].calc_endurance()
-            objects[g].calc_range()
-            objects[g].calc_lift()
-            objects[g].calc_vtail_lift()
-            objects[g].calc_drag()
-            objects[g].calc_velocity()
-
-            if objects[g].lift <= objects[g].mass* 0.95:
-                i = 1#r.randint(1,3)
-                if i == 1:
-                    while objects[g].lift <= objects[g].mass * 0.95:
-                        if objects[g].alpha <= 9:
-                            objects[g].alpha = objects[g].alpha + 0.25
-                            objects[g].calc_lift()
-                            objects[g].calc_velocity()
-                        else:
-                            i == 2
-                            break
-                if i == 2:
-                    while objects[g].lift <= objects[g].mass* 0.95:
-                        if objects[g].throttle < (len(objects[g].motor)-8):
-                            objects[g].throttle = objects[g].throttle + 1
-                            objects[g].calc_velocity()
-                            objects[g].calc_lift()
-                        else:
-                            i ==3
-                            break
-                if i == 3:
-                    while objects[g].lift <= objects[g].mass* 0.95:
-                            if objects[g].wingspan <= objects[g].max_wingspan*0.98:
-                                objects[g].wingspan = objects[g].wingspan * 1.01
-                                objects[g].chord_length = objects[g].chord_length * 1.01
-                                objects[g].calc_lift()
-                                objects[g].calc_velocity()
-                            else:
-                                del objects[g]
-            objects[g].calc_mass()
-            objects[g].calc_endurance()
-            objects[g].calc_range()
-            objects[g].calc_lift()
-            objects[g].calc_vtail_lift()
-            objects[g].calc_drag()
-            objects[g].calc_velocity()
-
-            if objects[g].lift >= objects[g].mass* 1.05:
-                i = 1
-                if i == 1:
-                    while objects[g].lift >= objects[g].mass * 1.05:
-                        if objects[g].alpha >= 2:
-                            objects[g].alpha = objects[g].alpha - 0.25
-                            objects[g].calc_lift()
-                            objects[g].calc_velocity()
-                        else:
-                            i == 2
-                            break
-                if i == 2:
-                    while objects[g].lift >= objects[g].mass* 1.05:
-                        if objects[g].throttle > 2:
-                            objects[g].throttle = objects[g].throttle - 1
-                            objects[g].calc_velocity()
-                            objects[g].calc_lift()
-                        else:
-                            i ==3
-                            break
-                if i == 3:
-                    while objects[g].lift >= objects[g].mass* 1.05:
-                            if objects[g].wingspan >= objects[g].min_wingspan*1.1:
-                                objects[g].wingspan = objects[g].wingspan * 0.99
-                                objects[g].chord_length = objects[g].chord_length * 0.99
-                                objects[g].calc_lift()
-                                objects[g].calc_velocity()
-                            else:
-                                del objects[g]
-            objects[g].calc_mass()
-            objects[g].calc_endurance()
-            objects[g].calc_range()
-            objects[g].calc_lift()
-            objects[g].calc_vtail_lift()
-            objects[g].calc_drag()
-            objects[g].calc_velocity()
-            
-            while objects[g].cruise_velocity < objects[g].stall_speed*1.1:
-                if objects[g].throttle < len(objects[g].motor) -4:
-                    objects[g].throttle = objects[g].throttle + 1
-                    objects[g].calc_mass()
-                    objects[g].calc_endurance()
-                    objects[g].calc_range()
-                    objects[g].calc_lift()
-                    objects[g].calc_vtail_lift()
-                    objects[g].calc_drag()
-                    objects[g].calc_velocity()
-                else:
-                    break
-            
+            objects[g] = instance_update(objects[g])
 
         '''Evaluation'''
         # Every object in our population is given a score, and added to the list of scores
@@ -168,12 +77,14 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         total_mass = 0
         total_wingspan = 0
         total_vel = 0
+        total_stall = 0
         total_end = 0
         total_range = 0
         total_ld = 0
         mass_score  = []
         wingspan_score = []
         vel_score = []
+        stall_score = []
         end_score = []
         range_score = []
         ld_score = []
@@ -182,14 +93,14 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             total_mass = total_mass + (objects[j].mass)
             total_wingspan = total_wingspan + (objects[j].wingspan)
             total_vel = total_vel + objects[j].cruise_velocity
+            total_stall = total_stall + objects[j].stall_speed
             total_end = total_end + objects[j].endurance
             total_range = total_range + objects[j].range
             total_ld = total_ld + (objects[j].lift/objects[j].drag)
         for u in range(pop):
             mass_score.append(abs(mass_obj - objects[u].mass)/mass_obj)
-            #ld_score.append(abs(ld_obj - (objects[u].CL/objects[u].CD))/ld_obj)
-            ld_score.append(abs(ld_obj - (Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CL']/Plane.airfoils[objects[u].airfoil_num].loc[1+4*objects[u].alpha, 'CD']))/ld_obj)
             vel_score.append(abs(vel_obj - objects[u].cruise_velocity)/vel_obj)
+            stall_score.append(abs(stall_obj - objects[u].stall_speed)/stall_obj)
             wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)
             end_score.append(abs(end_obj - objects[u].endurance)/end_obj)
             range_score.append(abs(range_obj - objects[u].range)/range_obj)
@@ -200,9 +111,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         score = []
         for k in range(pop):
             
-            # score.append((A)*(1-mass_score[k]) + (B)*(1-ld_score[k]) + (C)*(1-vel_score[k]) + (D)*(1-wingspan_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
-            '''Score without L/D'''
-            score.append((A)*(1-mass_score[k]) + (C)*(1-vel_score[k]) + (E)*(1-end_score[k]) + (F)*(1-range_score[k]))
+            score.append((A)*(1-mass_score[k]) + (B)*(1-vel_score[k]) + (C)*(1-wingspan_score[k]) + (D)*(1-end_score[k]) + (E)*(1-range_score[k]) + (F)*(1-stall_score[k]))
 
         '''Selection'''
         score_to_beat = np.linspace(min(score), max(score), pop)
@@ -252,7 +161,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             airfoil = airfoils[airfoil_sel]
             airfoil_num = airfoil_nums[airfoil_sel]
 
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
+            obj = Plane(payload_mass=payload,wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
             crossover.append(obj)
             objects.append(obj)
 
@@ -263,25 +172,28 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
             moto_sel = r.randint(0, len(keepers)-1)
             motor_num = keepers[moto_sel].motor_num
             motor = keepers[moto_sel].motor
+            motors = keepers[moto_sel].motors
             airfoil_sel = r.randint(0, len(keepers)-1)
             airfoil = keepers[airfoil_sel].airfoil
             airfoil_num = keepers[airfoil_sel].airfoil_num
             alpha = keepers[r.randint(0, len(keepers)-1)].alpha
             throttle = keepers[r.randint(0, len(keepers)-1)].throttle
-            obj = Plane(wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
+            obj = Plane(payload_mass=payload,wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,motors=motors,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
             objects.append(obj) 
             record.append(obj)
-            pure.append(obj)
+            if e < iteration_limit-1:
+                pure.append(obj)
 
         '''Mutation'''
         mutants = []
         for u in range(len(objects)):
             if r.uniform(0, 100) >= (100 - mutation_rate):
-                objects[u].wingspan = r.uniform(1, 3)
-                objects[u].batteries = r.randint(1, 4)
+                objects[u].wingspan = r.uniform((max_wing * 0.25), max_wing)
+                objects[u].batteries = r.randint(1, max_bat)
                 moto = r.randint(0, len(keepers)-1)
                 objects[u].motor_num = keepers[moto].motor_num
                 objects[u].motor = keepers[moto].motor
+                objects[u].motors = r.randint(1, max_motors)
                 ############AIRFOILS#############
                 objects[u].airfoil_num = r.randint(0, len(Plane.airfoils)-1)
                 objects[u].airfoil = Plane.airfoils[airfoil_num]
@@ -365,123 +277,45 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
     final_bat = pure[-1].batteries
     final_motor = pure[-1].motor
     final_motor_num = pure[-1].motor_num
+    final_motors = pure[-1].motors
     final_alpha = pure[-1].alpha
     final_airfoil = pure[-1].airfoil
     final_airfoil_num = pure[-1].airfoil_num
     final_throttle = pure[-1].throttle
-    final = Plane(wingspan=final_wing,batteries=final_bat,motor=final_motor,motor_num=final_motor_num,alpha=final_alpha,airfoil=final_airfoil,airfoil_num=final_airfoil_num,throttle=final_throttle)
+    final = Plane(payload_mass=payload, wingspan=final_wing,batteries=final_bat,motor=final_motor,motor_num=final_motor_num,motors=final_motors,alpha=final_alpha,airfoil=final_airfoil,airfoil_num=final_airfoil_num,throttle=final_throttle)
     final.wingspan = round(final.wingspan,3)
     final.chord_length = round(final.chord_length,3)
+
+    '''CG Calc'''
+    final.cg_checker()
+    while final.cg_check == False:
+        if final.cg_correction == 'tail heavy':
+            final.fuse_length = final.fuse_length*1.01
+        if final.cg_correction == 'nose heavy':
+            if final.fuse_length > 0.1:
+                final.fuse_length = final.fuse_length*0.99
+            elif final.batteries > 1:
+                final.batteries = final.batteries -1
+            else:
+                print("Conduct addiaional calculations for the cg, likely unstable")
+                break
+        final.cg_checker()
+    print(final.cg_check)
     final.fuse_diam = round(final.fuse_diam,3)
     final.fuse_length = round(final.fuse_length,3)
+    
     # Properites are calculated
-    final.calc_mass()
-    final.calc_endurance()
-    final.calc_range()
-    final.calc_lift()
-    final.calc_vtail_lift()
-    final.calc_drag()
-    final.calc_velocity()
-    # This if loop is used to make sure that the plane generates sufficient lift
-    if final.lift <= final.mass* 0.95:
-        i = 1#r.randint(1,3)
-        if i == 1:
-            while final.lift <= final.mass * 0.95:
-                if final.alpha <= 9:
-                    final.alpha = final.alpha + 0.25
-                    final.calc_lift()
-                    final.calc_velocity()
-                else:
-                    i == 2
-                    break
-        if i == 2:
-            while final.lift <= final.mass* 0.95:
-                if final.throttle < (len(final.motor)-7):
-                    final.throttle = final.throttle + 1
-                    final.calc_velocity()
-                    final.calc_lift()
-                else:
-                    i ==3
-                    break
-        if i == 3:
-            while final.lift <= final.mass* 0.95:
-                    if final.wingspan <= final.max_wingspan*0.98:
-                        final.wingspan = final.wingspan * 1.01
-                        final.chord_length = final.chord_length * 1.01
-                        final.calc_lift()
-                        final.calc_velocity()
-                    else:
-                        del final
-                        print("The algorithm failed to find a valid solution")
-                        print("Rethink your expectations!")
-        # If the charecteristics have changed then the properties are calculated again
-        final.calc_mass()
-        final.calc_endurance()
-        final.calc_range()
-        final.calc_lift()
-        final.calc_vtail_lift()
-        final.calc_drag()
-        final.calc_velocity()
-    if final.lift >= final.mass* 1.05:
-        i = 1#r.randint(1,3)
-        if i == 1:
-            while final.lift >= final.mass * 1.05:
-                if final.alpha >= 2:
-                    final.alpha = final.alpha - 0.25
-                    final.calc_lift()
-                    final.calc_velocity()
-                else:
-                    i == 2
-                    break
-        if i == 2:
-            while final.lift >= final.mass* 1.05:
-                if final.throttle > 2:
-                    final.throttle = final.throttle - 1
-                    final.calc_velocity()
-                    final.calc_lift()
-                else:
-                    i ==3
-                    break
-        if i == 3:
-            while final.lift >= final.mass* 1.05:
-                if final.wingspan >= final.min_wingspan*1.1:
-                    final.wingspan = final.wingspan * 0.99
-                    final.chord_length = final.chord_length * 0.99
-                    final.calc_lift()
-                    final.calc_velocity()
-                else:
-                    del final
-        final.calc_mass()
-        final.calc_endurance()
-        final.calc_range()
-        final.calc_lift()
-        final.calc_vtail_lift()
-        final.calc_drag()
-        final.calc_velocity()
-
-    while final.cruise_velocity < final.stall_speed*1.1:
-        if final.throttle < len(final.motor) -4:
-            final.throttle = final.throttle + 1
-            final.calc_mass()
-            final.calc_endurance()
-            final.calc_range()
-            final.calc_lift()
-            final.calc_vtail_lift()
-            final.calc_drag()
-            final.calc_velocity()
-
+    final = instance_update(final)
+    
     # Final score is calculated
     mass_score = (abs(mass_obj - final.mass)/mass_obj)
-    ld_score = (abs(ld_obj - (final.CL/final.CD))/ld_obj)
     vel_score = (abs(vel_obj - final.cruise_velocity)/vel_obj)
     wingspan_score = (abs(wingspan_obj - final.wingspan)/wingspan_obj)
     end_score = (abs(end_obj - final.endurance)/end_obj)
     range_score = (abs(range_obj - final.range)/range_obj)
-    # final.score = ((A)*(1-mass_score) + (B)*(1-ld_score) + (C)*(1-vel_score) + (D)*(1-wingspan_score) + (E)*(1-end_score) + (F)*(1-range_score))
-    # final_error = ((A+B+C+D+E+F - final.score)/(A+B+C+D+E+F))*100
-    '''no wingspan or L/D'''
-    final.score = ((C)*(1-vel_score) + (E)*(1-end_score) + (F)*(1-range_score))
-    final_error = ((C+E+F - final.score)/(C+E+F))*100
+    stall_score = (abs(stall_obj - final.stall_speed)/stall_obj)
+    final.score = ((A)*(1-mass_score) + (B)*(1-vel_score) + (C)*(1-wingspan_score) + (D)*(1-end_score) + (E)*(1-range_score) +(F)*(1-stall_score))
+    final_error = ((A+B+C+D+E+F - final.score)/(A+B+C+D+E+F))*100
 
     if final.score <= 0:
         plots = 0
@@ -494,7 +328,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         plt.scatter(mutants_list ,mutant_wing, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Wingspan")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Meters")
         plt.show()
         '''velocity'''
@@ -503,7 +337,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         plt.scatter(mutants_list ,mutant_vel, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Cruise Velocity")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Meters/Second")
         plt.show()
         '''mass'''
@@ -512,7 +346,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         plt.scatter(mutants_list ,mutant_mass, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Mass")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Kg")
         plt.show()
         '''endurance'''
@@ -521,7 +355,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         plt.scatter(mutants_list ,mutant_end, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Endurance")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Hours")
         plt.show()
         '''range'''
@@ -530,7 +364,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         plt.scatter(mutants_list ,mutant_range, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Range")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Km")
         plt.show()
         '''lift'''
@@ -539,7 +373,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
         plt.scatter(mutants_list ,mutant_lift, marker = ".", label="Mutants")
         plt.legend()
         plt.title("Lift")
-        plt.xlabel("Iteration Number")
+        plt.xlabel("Instance Number")
         plt.ylabel("Kg (converted from N)")
         plt.show()
         '''Endurance and Range'''
@@ -574,7 +408,7 @@ def GA(min_wing,max_wing,min_bat,max_bat,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,
 
         fig = plt.figure(10)
         plt.plot(range(len(keepers_score)), keepers_score)
-        plt.xlabel("Interations kept")
+        plt.xlabel("Instances kept")
         plt.ylabel("score")
         plt.title("Scores over time")
         plt.show()

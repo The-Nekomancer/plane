@@ -2,4 +2,11 @@
 *.pkl
 *.vsp3
 Results.csv
+*.STL
+*.SLDPRT
+*.SLDASM
+*.fsm
+*.vspaero
+
+
 __pycache__/*

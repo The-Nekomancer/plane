@@ -16,32 +16,41 @@ import time
 from performance_plotter import performance_plotter
 import pickle as pkl
 
+'''TO DO LIST
+- battery selection
+- Export to SolidWorks automatically
+- Add material selection
+    - PETG
+    - LW-PLA
+    - Carbon Fiber
+    - Fiber Glass
+'''
+
 priority = "low speed"
 #priority = "high speed"
 
 '''Fitness Function Weights'''
 mass = 1
-l_over_d = 1 # this might not be used  anymore?
-velocity = 10
-wingspan = 1 # this might not be used  anymore?
+velocity = 1
+stall = 1
+wingspan = 1
 endurance = 1
 total_range = 1
-#Total range is only used because 'range' is a reseved word in python
 
-'''Min/Max sizes'''
-min_bat = 1
-max_bat = 2
-min_wing = 0.75
-max_wing = 0.85
-battery_size = 4
+'''sizing'''
+max_bat = 4
+max_wing = 3 # meters
+max_motors = 1
+battery_size = 1
+payload_weight = 1 # kg
 
 '''Objective Scores'''
-mass_obj = 1.5 #meassured in kg
-ld_obj = 50 #NOT USED but will break GA if removed
-vel_obj = 25 #m/s
-wingspan_obj = 1.5 #NOT USED but will break GA if removed
-end_obj = 1 #hours
-range_obj = 25 #km
+mass_obj = 15 # kg
+vel_obj = 20 #m/s
+stall_obj = 12 #m/s
+wingspan_obj = 2 #meters
+end_obj = 3 #hours
+range_obj = 100 #km
 
 '''GA TWEAKING'''
 q1= 100 #population size
@@ -51,7 +60,7 @@ q4= 2 #mutation rate
 
 '''Exports (1), (0)'''
 GA_plots = False
-export_to_VSP = True
+export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
 
@@ -67,7 +76,7 @@ for p in range(1,2):
     for i in range(1,2):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
-        final, record, objects, final_error = GA(min_wing,max_wing,min_bat,max_bat, mass,l_over_d,velocity,wingspan,endurance,total_range, GA_plots,q1,q2,q3,q4,mass_obj,ld_obj,vel_obj,wingspan_obj,end_obj,range_obj,battery_size)
+        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,max_motors,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
         scores.append(final.score) #These are really only for easy comparison when tweaking GA parameters
         errors.append(round(final_error,5)) #^
         finals.append(final)                #^
@@ -104,20 +113,27 @@ if export_to_solidworks == True:
 
 '''Print data'''
 # The following is just an easy readout to confirm the results
-print(f"fuselage diameter: {str(final.fuse_diam)}")
-print(f"fuselage length: {str(final.fuse_length)}")
-print(f"chord length: {str(final.chord_length)}")
-print(f"Wingspan: {str(final.wingspan)}")
+print(f"Fuselage diameter: {str(final.fuse_diam)}" + " m")
+print(f"Fuselage length: {str(final.fuse_length)}"+ " m")
+print(f"Chord length: {str(final.chord_length)}"+ " m")
+print(f"Wingspan: {str(final.wingspan)}"+ " m")
 print(f"Number of Batteries: {str(final.batteries)}")
-print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)']))
+print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)'])+ " %")
 print(f"Motor: {str(final.motor_num)}")
-print(f"Velocity: {str(final.cruise_velocity)}")
-print(f"Stall Speed: {str(final.stall_speed)}")
-print(f"final score: {str(final.score)}")
-print(f"final lift: {str(final.lift)}")
-print(f"final mass: {str(final.mass)}")
-print(f"final alpha: {str(final.alpha)}")
-print(f"final endurance: {str(final.endurance)}")
-print(f"final range: {str(final.range)}")
-print("final current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']))
+print(f"Velocity: {str(round(final.cruise_velocity,3))}"+ " m/s")
+print(f"Stall Speed: {str(round(final.stall_speed,2))}"+ " m/s")
+print(f"Score: {str(round(final.score,2))}")
+print(f"Lift: {str(round(final.lift,2))}"+ " kg")
+print(f"Mass: {str(round(final.mass,2))}"+ " kg")
+print(f"Alpha: {str(final.alpha)}"+ " degrees")
+print(f"Endurance: {str(round(final.endurance,2))}"+ " hours")
+print(f"Range: {str(round(final.range,2))}"+ " km")
+print("Current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)'])+ " A")
 print(f"airfoil: {str(final.airfoil_num)}")
+# print(f"final mass: {str(final.mass)}")
+print(f"Fuselage mass: {str(final.fuse_mass)}"+ " kg")
+print(f"Wing mass: {str(final.wing_mass)}"+ " kg")
+print(f"Tail mass: {str(final.tail_mass)}"+ " kg")
+print(f"Tail length: {str(final.tail_length)}"+ " m")
+# print(f"vtail length: {str(final.vtail_length)}")
+print(f"Ruddervator mass: {str(final.vtail_mass)}"+ " kg")
