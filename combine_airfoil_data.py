@@ -21,7 +21,7 @@ def combine_airfoil_data(performance_csv, geometry_txt, output_csv):
     # Add Block Type Column
     performance_df['Block_Type'] = 'Performance'
 
-    # Ad Geometry Columns
+    # Add Geometry Columns
     performance_df['x_coord'] = None
     performance_df['y_coord'] = None
     performance_df['z_coord'] = None
