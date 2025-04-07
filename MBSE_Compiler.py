@@ -34,23 +34,23 @@ mass = 1
 velocity = 1
 stall = 1
 wingspan = 1
-endurance = 1
+endurance = 2
 total_range = 1
 
 '''sizing'''
 max_bat = 4
 max_wing = 3 # meters
-max_motors = 1
+max_motors = 2
 battery_size = 1
-payload_weight = 1 # kg
+payload_weight = 2.5 # kg
 
 '''Objective Scores'''
-mass_obj = 15 # kg
+mass_obj = 6 # kg
 vel_obj = 20 #m/s
-stall_obj = 12 #m/s
+stall_obj = 10 #m/s
 wingspan_obj = 2 #meters
-end_obj = 3 #hours
-range_obj = 100 #km
+end_obj = 0.5 #hours
+range_obj = 20 #km
 
 '''GA TWEAKING'''
 q1= 100 #population size
@@ -73,7 +73,7 @@ for p in range(1,2):
     scores = []
     errors = []
     finals = []
-    for i in range(1,2):
+    for i in range(1,26):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
         final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,max_motors,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
@@ -118,8 +118,9 @@ print(f"Fuselage length: {str(final.fuse_length)}"+ " m")
 print(f"Chord length: {str(final.chord_length)}"+ " m")
 print(f"Wingspan: {str(final.wingspan)}"+ " m")
 print(f"Number of Batteries: {str(final.batteries)}")
-print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle (%)'])+ " %")
+print("Motor throttle: "  + str(Plane.motors[final.motor_num].at[(final.throttle), 'Throttle'])+ " %")
 print(f"Motor: {str(final.motor_num)}")
+print(f"Number of motors: {str(final.motors)}")
 print(f"Velocity: {str(round(final.cruise_velocity,3))}"+ " m/s")
 print(f"Stall Speed: {str(round(final.stall_speed,2))}"+ " m/s")
 print(f"Score: {str(round(final.score,2))}")
@@ -137,3 +138,4 @@ print(f"Tail mass: {str(final.tail_mass)}"+ " kg")
 print(f"Tail length: {str(final.tail_length)}"+ " m")
 # print(f"vtail length: {str(final.vtail_length)}")
 print(f"Ruddervator mass: {str(final.vtail_mass)}"+ " kg")
+print(f"Payload mass: {str(final.payload_mass)}"+ " kg")

@@ -1,0 +1,24 @@
+CG good: True
+Fuselage diameter: 0.11 m
+Fuselage length: 0.33 m
+Chord length: 0.312 m
+Wingspan: 1.869 m
+Number of Batteries: 1
+Motor throttle: 55 %
+Motor: f60 pro IV
+Number of motors: 2
+Velocity: 15.24 m/s
+Stall Speed: 9.53 m/s
+Score: 6.08
+Lift: 5.72 kg
+Mass: 4.99 kg
+Alpha: 1.75 degrees
+Endurance: 0.51 hours
+Range: 27.71 km
+airfoil: NACA 4412
+Fuselage mass: 0.352 kg
+Wing mass: 0.6414 kg
+Tail mass: 0.045 kg
+Tail length: 0.45 m
+Ruddervator mass: 0.12 kg
+Payload mass: 2.5 kg

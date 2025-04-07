@@ -1,4 +1,4 @@
-Throttle (%),Thrust (kg),Torque (N*m),Current (A),RPM,Inputpower (W),Efficiency (g/W),mass
+Throttle,Thrust (kg),Torque (N*m),Current (A),RPM,Inputpower (W),Efficiency (g/W),mass
 50,0.49352,n/a,6.41,18316,150.03,,0.0333
 55,0.58146,n/a,7.92,19747,185.23,3.14,0.0333
 60,0.65387,n/a,9.55,21319,222.98,2.93,0.0333

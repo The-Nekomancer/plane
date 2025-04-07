@@ -56,8 +56,8 @@ class Plane:
     v10l_kv170 = pd.read_csv('V10L_KV170.csv')
     U8II = pd.read_csv('U8II.csv')
     f60pro4 = pd.read_csv('f60pro4.csv')
-    motors = ([v602_kv180, v10l_kv170, f60pro4])
-    #motors = ([f60pro4])
+    # motors = ([v602_kv180, v10l_kv170, f60pro4])
+    motors = ([f60pro4])
     '''Batteries'''
     bat_8000_6s = {"cells": 6,"capacity": 8000, "mass": 1.136, "length": 0.165, "width": 0.0635, "height": 0.051}
     bat_2200_4s = {"cells": 4,"capacity": 2200, "mass": 0.1786, "length": 0.1016, "width": 0.04572, "height": 0.04572}
@@ -72,9 +72,9 @@ class Plane:
                 cruise_velocity = 15.24,
                 motor = motors[0],
                 motors = 1,
-                bat = batts[2],
+                bat = batts[0],
                 batteries = 2,
-                fuse_diam = 0.085,
+                fuse_diam = 0.11,
                 fuse_length = .25,
                 payload_skid_width = .1,
                 payload_skid_length = .15,
