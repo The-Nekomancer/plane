@@ -24,29 +24,72 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from instance_update import *
 
-# r.seed(36)
-def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
-    '''Initial Population Creation'''
+def GA(config):
+    """Main function for the GA
+    Genetic Algorithm:
+    - population creation
+    - evaluation
+    - fitness function
+    - selection
+    - crossover
+    - population replacement
+    - mutation
+    """
+    # Extracting parameters from the config dictionary
+    payload = config['payload_weight']
+    max_wing = config['max_wing']
+    max_bat = config['max_bat']
+    max_motors = config['max_motors']
+    
+    # These are the weights for the fitness function, they allow for the user to specify
+    A = config['mass_weight']
+    B = config['velocity_weight']
+    C = config['wingspan_weight']
+    D = config['endurance_weight']
+    E = config['range_weight']
+    F = config['stall_weight']
+
+    plots = config['GA_plots']
+    pop = config["q1"] # Population size
+    iteration_limit = config["q2"] # Number of generations
+    keep_ratio = config["q3"] # Ratio of the population to keep
+    mutation_rate = config["q4"] # Mutation rate
+
+    # Objective scores, these are the values that the GA is trying to achieve
+    mass_obj = config['mass_obj']
+    vel_obj = config['vel_obj']
+    wingspan_obj = config['wingspan_obj']
+    end_obj = config['end_obj']
+    range_obj = config['range_obj']
+    stall_obj = config['stall_obj']
+
+    bat_cell_size = config['battery_size']
+
+    material = config['material'] # Material selection
+
     record = []
     objects = []
     pure = []
     all_mutants = []
     mutants_list = []
     keepers_score = []
+    
+    keep = int(round(pop * keep_ratio, 0))
+    """Initial Population Creation"""
     #THESE VALUES WORK
     #pop = 100
     #iteration_limit = 100
     #keep = 5
     #mutation_rate = 2
-    pop = q1
-    iteration_limit = q2
-    keep = int(round(pop*q3,0))
-    mutation_rate = q4
+    #pop = q1
+    #iteration_limit = q2
+    #keep = int(round(pop*q3,0))
+    #mutation_rate = q4
     '''battery pool'''
-    usable_bats =[]
-    for q in range(len(Plane.batts)):
-        if Plane.batts[q].get("cells") == bat_cell_size:
-            usable_bats.append(Plane.batts[q])
+    usable_bats = []
+    for q_ in range(len(Plane.batts)):
+        if Plane.batts[q_].get("cells") == bat_cell_size:
+            usable_bats.append(Plane.batts[q_])
     
     for i in range(pop):
         wing= r.uniform((max_wing * 0.25),max_wing)
@@ -58,8 +101,22 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
         alpha = r.randint(0,36)/4
         airfoil_num = r.randint(0, len(Plane.airfoils)-1)
         airfoil = Plane.airfoils[airfoil_num]
-        bat = Plane.batts[2]
-        obj = Plane(payload_mass=payload,wingspan=wing,batteries=batteries,motor=motor,motors=motors,alpha=alpha,throttle=throttle,motor_num=motor_num,airfoil_num=airfoil_num,airfoil=airfoil)
+        #bat = Plane.batts[2]
+        
+        obj = Plane(
+            payload_mass=payload,
+            wingspan=wing,
+            batteries=batteries,
+            motor=motor,
+            motors=motors,
+            alpha=alpha,
+            throttle=throttle,
+            motor_num=motor_num,
+            airfoil_num=airfoil_num,
+            airfoil=airfoil,
+            material=material
+        )
+        
         objects.append(obj)
         pure.append(obj)
         record.append(obj)
@@ -161,7 +218,18 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
             airfoil = airfoils[airfoil_sel]
             airfoil_num = airfoil_nums[airfoil_sel]
 
-            obj = Plane(payload_mass=payload,wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
+            obj = Plane(payload_mass=payload,
+                        wingspan=wingspan,
+                        batteries=batteries,
+                        motor=motor,
+                        motor_num=moto_num,
+                        alpha=alpha,
+                        throttle=throttle,
+                        airfoil=airfoil,
+                        airfoil_num=airfoil_num,
+                        material=material
+            )
+            
             crossover.append(obj)
             objects.append(obj)
 
@@ -178,7 +246,19 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
             airfoil_num = keepers[airfoil_sel].airfoil_num
             alpha = keepers[r.randint(0, len(keepers)-1)].alpha
             throttle = keepers[r.randint(0, len(keepers)-1)].throttle
-            obj = Plane(payload_mass=payload,wingspan=wingspan,batteries=batteries,motor=motor,motor_num=moto_num,motors=motors,alpha=alpha,throttle=throttle,airfoil=airfoil,airfoil_num=airfoil_num)
+            
+            obj = Plane(payload_mass=payload,
+                        wingspan=wingspan,
+                        batteries=batteries,
+                        motor=motor,
+                        motor_num=moto_num,
+                        motors=motors,
+                        alpha=alpha,
+                        throttle=throttle,
+                        airfoil=airfoil,
+                        airfoil_num=airfoil_num,
+                        material=material
+            )
             objects.append(obj) 
             record.append(obj)
             if e < iteration_limit-1:
@@ -282,7 +362,20 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
     final_airfoil = pure[-1].airfoil
     final_airfoil_num = pure[-1].airfoil_num
     final_throttle = pure[-1].throttle
-    final = Plane(payload_mass=payload, wingspan=final_wing,batteries=final_bat,motor=final_motor,motor_num=final_motor_num,motors=final_motors,alpha=final_alpha,airfoil=final_airfoil,airfoil_num=final_airfoil_num,throttle=final_throttle)
+    
+    final = Plane(payload_mass=payload,
+                  wingspan=final_wing,
+                  batteries=final_bat,
+                  motor=final_motor,
+                  motor_num=final_motor_num,
+                  motors=final_motors,
+                  alpha=final_alpha,
+                  airfoil=final_airfoil,
+                  airfoil_num=final_airfoil_num,
+                  throttle=final_throttle,
+                  material=material
+    )
+    
     final.wingspan = round(final.wingspan,3)
     final.chord_length = round(final.chord_length,3)
 
