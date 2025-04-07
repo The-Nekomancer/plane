@@ -38,18 +38,18 @@ endurance = 1
 total_range = 1
 
 '''sizing'''
-max_bat = 4
-max_wing = 3 # meters
+max_bat = 4 
+max_wing = 3  #meters
 max_motors = 1
-battery_size = 1
-payload_weight = 1 # kg
+battery_size = 1 
+payload_weight = 1 #kg
 
 '''Objective Scores'''
 mass_obj = 15 # kg
-vel_obj = 20 #m/s
-stall_obj = 12 #m/s
+vel_obj = 20 # m/s
+stall_obj = 12 # m/s
 wingspan_obj = 2 #meters
-end_obj = 3 #hours
+end_obj = 3 # hours
 range_obj = 100 #km
 
 '''GA TWEAKING'''
@@ -64,6 +64,45 @@ export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
 
+# Config for the GA
+config = {
+    # fitness function weights
+    "priority": priority,
+    "mass_weight": mass,
+    "velocity_weight": velocity,
+    "stall_weight": stall,
+    "wingspan_weight": wingspan,
+    "range_weight": total_range,
+    "endurance_weight": endurance,
+
+    # sizing
+    "payload_weight": payload_weight,
+    "max_bat": max_bat,
+    "max_wing": max_wing,
+    "max_motors": max_motors,
+    "battery_size": battery_size,
+
+    # objective scores
+    "mass_obj": mass_obj,
+    "vel_obj": vel_obj,
+    "stall_obj": stall_obj,
+    "wingspan_obj": wingspan_obj,
+    "end_obj": end_obj,
+    "range_obj": range_obj,
+
+    # GA parameters
+    "q1": q1,
+    "q2": q2,
+    "q3": q3,
+    "q4": q4,
+    "GA_plots": GA_plots,
+
+    # Material selection
+    "material": "LW-PLA" # choose from: "Auto", "PETG", "LW-PLA", "Carbon Fiber", "Fiber Glass"
+}
+
+
+
 '''Optimization'''
 # The 'i' for loop runs the whole GA multiple times and picks the best result of all trials, 25 is optimal
 # the 'p' for loop is to confirm the results of the 'i' loop, is not needed other than testing, set to 2
@@ -76,7 +115,8 @@ for p in range(1,2):
     for i in range(1,2):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
-        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,max_motors,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
+        print("Running GA...")
+        final, record, objects, final_error = GA(config) # This is where the GA is called
         scores.append(final.score) #These are really only for easy comparison when tweaking GA parameters
         errors.append(round(final_error,5)) #^
         finals.append(final)                #^
@@ -113,6 +153,9 @@ if export_to_solidworks == True:
 
 '''Print data'''
 # The following is just an easy readout to confirm the results
+print("Final Results:")
+print("=====================================")
+print(f"Material: {str(true_final.material)}")
 print(f"Fuselage diameter: {str(final.fuse_diam)}" + " m")
 print(f"Fuselage length: {str(final.fuse_length)}"+ " m")
 print(f"Chord length: {str(final.chord_length)}"+ " m")
