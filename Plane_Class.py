@@ -64,6 +64,34 @@ class Plane:
     bat_1350_6s = {"cells": 6,"capacity": 1350, "mass": 0.259, "length": 0.076, "width": 0.034, "height": 0.051}
     batts = ([bat_8000_6s,bat_2200_4s,bat_1350_6s])
 
+    # Dictionary of dictionaries for material properties and multipliers based on different parts
+    material_factors = {
+        "Carbon-Fiber": {
+            "fuse_mult": 250,
+            "wing_mult": 550,
+            "tail_mult": 100,
+            "vtail_mult": 3000
+        },
+        "Fiberglass": {
+            "fuse_mult": 300,
+            "wing_mult": 600,
+            "tail_mult": 120,
+            "vtail_mult": 3200
+        },
+        "PETG": {
+            "fuse_mult": 400,
+            "wing_mult": 700,
+            "tail_mult": 150,
+            "vtail_mult": 3500
+        },
+        "LW-PLA": {
+            "fuse_mult": 350,
+            "wing_mult": 650,
+            "tail_mult": 140,
+            "vtail_mult": 3400
+        },
+    }
+
     def __init__(self, name = "test plane",
                 wingspan = 2.540,
                 airfoil = naca2412, 
@@ -83,7 +111,8 @@ class Plane:
                 throttle = 3,
                 motor_num = 0,
                 config = 'VTail',
-                score = 0):
+                score = 0,
+                material = "Auto"):
         self.name = name
         self.wingspan = wingspan
         self.chord_length = wingspan/6
@@ -112,22 +141,113 @@ class Plane:
         self.throttle = throttle
         self.motor_num = motor_num
         self.score = score
+
+        # Auto material handling logic
+        self.material = material # store user's material choice
+        if material == "Auto":
+            # If "Auto" is selected, automatically select the material
+            self.auto_select_material()
+
+    def auto_select_material(self):
+        """
+        When self.material == "Auto", the lowest mass material 
+        by testing each real material from the material_factors dict.
+        This is used to auto-select the material for the plane.
+        """
+        possible_material = list(Plane.material_factors.keys()) # Carbon-Fiber, Fiberglass, PETG, LW-PLA
+        mass_dict = {}
+        best_mat = None
+        lowest_mass = float('inf')
         
+        # Evaluate each possible material
+        for mat in possible_material:
+            test_mass = self.quick_mass_calc(mat)
+            mass_dict[mat] = test_mass
+            if test_mass < lowest_mass:
+                lowest_mass = test_mass
+                best_mat = mat
+        
+        # Store best material in self.material
+        self.material = best_mat
+
+        # print rationale for material selection
+        print(f"Auto-selected material: {self.name}")
+        for mat, mval in mass_dict.items():
+            print(f"{mat} => {round(mval, 3)} kg")
+        print(f"Chosen material: {best_mat} (lowest mass = {round(lowest_mass, 3)} kg)\n")
+
+    #########CALCULATION METHODS###########################################
+    def quick_mass_calc(self, test_material):
         """
-        CALCULATION METHODS
+        Returns total mass if the plane's geometry were made from test_material,
+        without altering self.mass or any other attributes.
+        This is used for the auto-select material feature. 
         """
-        #########CALCULATION METHODS###########################################
+        mat_factors = Plane.material_factors[test_material]
+        
+        # battery and electronics mass
+        # The mass of the batteries and electronics skid is calculated by multiplying the number of batteries
+        # by the mass of a single battery and adding a constant for the electronics skid
+        bat_skid_mass = self.batteries * self.bat["mass"]
+        elec_skid_mass = 0.13
+
+        # geometric-based surfaces mass
+        # The mass of the fuselage, wing, tail, and vtail is calculated by multiplying the surface area
+        # by a material factor and the mass of a single unit
+        fuse_surf_area = (2*np.pi*(self.fuse_diam/2)
+                          + self.fuse_length
+                          + np.pi*(self.fuse_diam/2)**2
+                          + 2*np.pi*(self.fuse_diam/2)**2)
+        
+        # mass = surface area * thickness * density factor
+        fuse_mass = fuse_surf_area * 0.002 * mat_factors["fuse_mult"]
+        wing_mass = self.wingspan * self.chord_length * 0.002 * mat_factors["wing_mult"]
+        tail_mass = self.tail_length * 0.001 * mat_factors["tail_mult"]
+        vtail_mass = 2 * self.vtail_length * self.vtail_chord * 0.002 * mat_factors["vtail_mult"]
+
+        motor_mass = Plane.motors[self.motor_num].loc[2, 'mass'] * self.motors
+        
+        # The total mass is calculated by adding the masses of all components
+        total_mass = (bat_skid_mass + self.payload_mass + fuse_mass + wing_mass +
+                      tail_mass + vtail_mass + elec_skid_mass + motor_mass)
+        return total_mass
+
+        
     def calc_mass(self):
+        """
+        Overwites self.mass, self.fuse_mass, self.wing_mass, etc.
+        based on self.material, self.wingspan, etc.
+        The mass of the plane is calculated by summing the masses of all components:
+        """
+        # Grab dict of current material factors, if self.material isnt in dict, default to Carbon-Fiber
+        mat_factors = Plane.material_factors.get(self.material, Plane.material_factors["PETG"])
+        
         self.bat_skid_mass = self.batteries * self.bat["mass"]
         self.elec_skid_mass = 0.13
-        # Surface area calculated is equal to the surface area of a clyinder with one end being a sphere
-        self.fuse_surf_area = 2*np.pi*(self.fuse_diam/2) + self.fuse_length + np.pi*(self.fuse_diam/2)**2 + 2*np.pi*(self.fuse_diam/2)**2
-        self.fuse_mass = round(self.fuse_surf_area * 0.002 * 250,4)
-        self.wing_mass = round(self.wingspan * self.chord_length *0.002 * 550,4)
-        self.tail_mass = round(self.tail_length * 0.001 * 100,4)
-        self.vtail_mass = round(2 * self.vtail_length * self.vtail_chord * 0.002 * 3000,4)
+        
+        # geometric-based surfaces mass
+        self.fuse_surf_area = (2*np.pi*(self.fuse_diam/2) 
+                               + self.fuse_length 
+                               + np.pi*(self.fuse_diam/2)**2 
+                               + 2*np.pi*(self.fuse_diam/2)**2)
+        
+        # usage of material multipliers
+        self.fuse_mass = round(self.fuse_surf_area * 0.002 * mat_factors["fuse_mult"],4)
+        self.wing_mass = round(self.wingspan * self.chord_length *0.002 * mat_factors["wing_mult"], 4)
+        self.tail_mass = round(self.tail_length * 0.001 * mat_factors["tail_mult"], 4)
+        self.vtail_mass = round(2 * self.vtail_length * self.vtail_chord * 0.002 * mat_factors["vtail_mult"], 4)
+        
         motor_mass = Plane.motors[self.motor_num].loc[2, 'mass'] * self.motors
-        self.mass = round(self.bat_skid_mass + self.payload_mass + self.fuse_mass + self.wing_mass + self.tail_mass + self.vtail_mass + self.elec_skid_mass + motor_mass,4)
+        
+        # The total mass calculated by adding the masses of all components
+        self.mass = round(self.bat_skid_mass 
+                          + self.payload_mass 
+                          + self.fuse_mass 
+                          + self.wing_mass 
+                          + self.tail_mass 
+                          + self.vtail_mass 
+                          + self.elec_skid_mass 
+                          + motor_mass,4)
         self.center_of_gravity = round(self.fuse_length * 0.33,2) #<---------- This is shouldn't be calculated this way, must change later
         self.wing_pos = (self.fuse_diam/2) - self.fuse_diam*0.2 #Vertical position relative to fuselage
 
