@@ -19,11 +19,7 @@ import pickle as pkl
 '''TO DO LIST
 - battery selection
 - Export to SolidWorks automatically
-- Add material selection
-    - PETG
-    - LW-PLA
-    - Carbon Fiber
-    - Fiber Glass
+
 '''
 
 priority = "low speed"
