@@ -25,7 +25,7 @@ import pandas as pd
 from instance_update import *
 
 # r.seed(36)
-def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,bat_cell_size):
+def GA(payload,max_wing,max_bat,max_motors,arspd_weight,end_weight,range_weight,stall_weight,plots,vel_obj,end_obj,range_obj,stall_obj,bat_cell_size):
     '''Initial Population Creation'''
     record = []
     objects = []
@@ -33,15 +33,10 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
     all_mutants = []
     mutants_list = []
     keepers_score = []
-    #THESE VALUES WORK
-    #pop = 100
-    #iteration_limit = 100
-    #keep = 5
-    #mutation_rate = 2
-    pop = q1
-    iteration_limit = q2
-    keep = int(round(pop*q3,0))
-    mutation_rate = q4
+    pop = 150
+    iteration_limit = 200
+    keep = int(round(pop*0.05,0))
+    mutation_rate = 2
     '''battery pool'''
     usable_bats =[]
     for q in range(len(Plane.batts)):
@@ -88,6 +83,9 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
         end_score = []
         range_score = []
         ld_score = []
+        mass_obj = 0.25
+        ld_obj = 100
+        wingspan_obj = 0.1
 
         for j in range(pop):
             total_mass = total_mass + (objects[j].mass)
@@ -104,14 +102,16 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
             wingspan_score.append(abs(wingspan_obj - objects[u].wingspan)/wingspan_obj)
             end_score.append(abs(end_obj - objects[u].endurance)/end_obj)
             range_score.append(abs(range_obj - objects[u].range)/range_obj)
+            ld_score.append(abs(ld_obj - (objects[u].lift/objects[u].drag))/ld_obj)
 
         '''Fitness Function'''
         # Weighted fitness function, allows for the user to specify priorities
         # This is in contrast to prioritizing a single metric and moving the rest to constraints
         score = []
+        avg_weight = 0.25*(arspd_weight+end_weight+range_weight+stall_weight)/(4)
         for k in range(pop):
-            
-            score.append((A)*(1-mass_score[k]) + (B)*(1-vel_score[k]) + (C)*(1-wingspan_score[k]) + (D)*(1-end_score[k]) + (E)*(1-range_score[k]) + (F)*(1-stall_score[k]))
+            objects[k].indi_score = (arspd_weight)*(1-vel_score[k]) + (end_weight)*(1-end_score[k]) + (range_weight)*(1-range_score[k]) + (stall_weight)*(1-stall_score[k]) + (avg_weight*0.1)*(1-mass_score[k])+(avg_weight)*(1-wingspan_score[k])+(avg_weight)*(1-ld_score[k])
+            score.append(objects[k].indi_score)
 
         '''Selection'''
         score_to_beat = np.linspace(min(score), max(score), pop)
@@ -314,12 +314,12 @@ def GA(payload,max_wing,max_bat,max_motors,A,B,C,D,E,F,plots,q1,q2,q3,q4,mass_ob
     end_score = (abs(end_obj - final.endurance)/end_obj)
     range_score = (abs(range_obj - final.range)/range_obj)
     stall_score = (abs(stall_obj - final.stall_speed)/stall_obj)
-    final.score = ((A)*(1-mass_score) + (B)*(1-vel_score) + (C)*(1-wingspan_score) + (D)*(1-end_score) + (E)*(1-range_score) +(F)*(1-stall_score))
-    final_error = ((A+B+C+D+E+F - final.score)/(A+B+C+D+E+F))*100
+    ld_score = (abs(ld_obj - (final.lift/final.drag))/ld_obj)
+    final.active_score = (arspd_weight)*(1-vel_score) + (end_weight)*(1-end_score) + (range_weight)*(1-range_score) + (stall_weight)*(1-stall_score)
+    final.reactive_score = (avg_weight)*(1-mass_score)+(avg_weight)*(1-wingspan_score)+(avg_weight)*(1-ld_score)
+    final.score = final.active_score + final.reactive_score
+    final_error = ((arspd_weight+end_weight+range_weight+stall_weight - final.active_score)/(arspd_weight+end_weight+range_weight+stall_weight))*100
 
-    if final.score <= 0:
-        plots = 0
-        print("The Algorithm failed to produce a viable options based on the requirements")
     # All of our plots are generated
     if plots == 1:
         '''wingspan'''

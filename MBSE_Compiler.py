@@ -26,36 +26,26 @@ priority = "low speed"
 #priority = "high speed"
 
 '''Fitness Function Weights'''
-mass = 1
-velocity = 1
-stall = 1
-wingspan = 1
+velocity = 2
+stall = 3
 endurance = 2
 total_range = 1
 
 '''sizing'''
 max_bat = 4
 max_wing = 3 # meters
-max_motors = 2
+max_motors = 3
 battery_size = 1
-payload_weight = 2.5 # kg
+payload_weight = 8 # kg
 
 '''Objective Scores'''
-mass_obj = 6 # kg
 vel_obj = 20 #m/s
-stall_obj = 10 #m/s
-wingspan_obj = 2 #meters
-end_obj = 0.5 #hours
-range_obj = 20 #km
+stall_obj = 8 #m/s
+end_obj = 2 #hours
+range_obj = 100 #km
 
-'''GA TWEAKING'''
-q1= 100 #population size
-q2= 100 #generations
-q3= 0.05 #keepers
-q4= 2 #mutation rate
-
-'''Exports (1), (0)'''
-GA_plots = False
+'''Exports'''
+GA_plots = True
 export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
@@ -69,10 +59,10 @@ for p in range(1,2):
     scores = []
     errors = []
     finals = []
-    for i in range(1,26):
+    for i in range(1,2):
         print(f"Set: {str(p)}")
         print(f"Iteration: {str(i)}")
-        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,max_motors,mass,velocity,wingspan,endurance,total_range,stall, GA_plots,q1,q2,q3,q4,mass_obj,vel_obj,wingspan_obj,end_obj,range_obj,stall_obj,battery_size)
+        final, record, objects, final_error = GA(payload_weight,max_wing,max_bat,max_motors,velocity,endurance,total_range,stall,GA_plots,vel_obj,end_obj,range_obj,stall_obj,battery_size)
         scores.append(final.score) #These are really only for easy comparison when tweaking GA parameters
         errors.append(round(final_error,5)) #^
         finals.append(final)                #^
