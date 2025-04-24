@@ -110,7 +110,7 @@ def GA(payload,max_wing,max_bat,max_motors,arspd_weight,end_weight,range_weight,
         score = []
         avg_weight = 0.25*(arspd_weight+end_weight+range_weight+stall_weight)/(4)
         for k in range(pop):
-            objects[k].indi_score = (arspd_weight)*(1-vel_score[k]) + (end_weight)*(1-end_score[k]) + (range_weight)*(1-range_score[k]) + (stall_weight)*(1-stall_score[k]) + (avg_weight*0.1)*(1-mass_score[k])+(avg_weight)*(1-wingspan_score[k])+(avg_weight)*(1-ld_score[k])
+            objects[k].indi_score = (arspd_weight)*(1-vel_score[k]) + (end_weight)*(1-end_score[k]) + (range_weight)*(1-range_score[k]) + (stall_weight)*(1-stall_score[k]) + (avg_weight*0.1)*(1-mass_score[k])+(avg_weight*0)*(1-wingspan_score[k])+(avg_weight)*(1-ld_score[k])
             score.append(objects[k].indi_score)
 
         '''Selection'''
