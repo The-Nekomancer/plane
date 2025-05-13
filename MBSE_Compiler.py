@@ -45,7 +45,7 @@ end_obj = 2 #hours
 range_obj = 100 #km
 
 '''Exports'''
-GA_plots = True
+GA_plots = False
 export_to_VSP = False
 export_to_flight_stream = False
 export_to_solidworks = True
