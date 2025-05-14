@@ -19,11 +19,11 @@ import pickle as pkl
 '''TO DO LIST
 - battery selection
 - Export to SolidWorks automatically
+- Taper ratio (elliptical wing)
+- Variable aspect ratio
+- VTOL
 
 '''
-
-priority = "low speed"
-#priority = "high speed"
 
 '''Fitness Function Weights'''
 velocity = 2
@@ -36,13 +36,13 @@ max_bat = 4
 max_wing = 3 # meters
 max_motors = 3
 battery_size = 1
-payload_weight = 8 # kg
+payload_weight = 2 # kg
 
 '''Objective Scores'''
-vel_obj = 20 #m/s
+vel_obj = 12 #m/s
 stall_obj = 8 #m/s
-end_obj = 2 #hours
-range_obj = 100 #km
+end_obj = 0.8 #hours
+range_obj = 50 #km
 
 '''Exports'''
 GA_plots = False
@@ -115,7 +115,7 @@ print(f"Mass: {str(round(final.mass,2))}"+ " kg")
 print(f"Alpha: {str(final.alpha)}"+ " degrees")
 print(f"Endurance: {str(round(final.endurance,2))}"+ " hours")
 print(f"Range: {str(round(final.range,2))}"+ " km")
-print("Current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)'])+ " A")
+print("Current draw: "+ str(Plane.motors[final.motor_num].at[(final.throttle), 'Current (A)']*final.motors)+ " A")
 print(f"airfoil: {str(final.airfoil_num)}")
 # print(f"final mass: {str(final.mass)}")
 print(f"Fuselage mass: {str(final.fuse_mass)}"+ " kg")

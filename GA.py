@@ -33,8 +33,8 @@ def GA(payload,max_wing,max_bat,max_motors,arspd_weight,end_weight,range_weight,
     all_mutants = []
     mutants_list = []
     keepers_score = []
-    pop = 150
-    iteration_limit = 200
+    pop = 100
+    iteration_limit = 100
     keep = int(round(pop*0.05,0))
     mutation_rate = 2
     '''battery pool'''

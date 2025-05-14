@@ -47,17 +47,21 @@ def vsp_geom_creator(final):
     vsp.SetParmVal(wid, "Z_Rel_Location", "XForm", final.fuse_diam/2)
     vsp.CutXSec( wid, 1 )
     vsp.SetDriverGroup( wid, 1, vsp.AREA_WSECT_DRIVER, vsp.ROOTC_WSECT_DRIVER, vsp.TIPC_WSECT_DRIVER )
-    vsp.SetParmVal( wid, "Root_Chord", "XSec_1", final.chord_length )
-    vsp.SetParmVal( wid, "Tip_Chord", "XSec_1", final.chord_length )
+    # vsp.SetParmVal( wid, "Root_Chord", "XSec_1", final.chord_length )
+    # vsp.SetParmVal( wid, "Tip_Chord", "XSec_1", final.chord_length )
     vsp.SetParmVal( wid, "Sweep", "XSec_1", 0)
     vsp.SetParmVal( wid, "TotalSpan", "WingGeom", final.wingspan )
-    # vsp.AddSubSurf(wid, "SS_CONT_0")
-
+    
+    '''Taper ratio'''
+    tr = 0.4 # this is the ideal taper ratio
+    tipchord = final.chord_length*tr
+    area = final.wingspan*final.chord_length 
+    rootchord = 2*area/final.wingspan - tipchord
+    vsp.SetParmVal( wid, "Tip_Chord", "XSec_1", tipchord )
+    vsp.SetParmVal( wid, "Root_Chord", "XSec_1", rootchord )
+    vsp.SetParmVal( wid, "Sweep_Location", "XSec_1", 0.5 )
+    
     '''Airfoil'''
-    #vsp.SetParmVal( wid, "Camber", "XSecCurve_0", 0.02 )
-    #vsp.SetParmVal( wid, "CamberLoc", "XSecCurve_0", 0.4 )
-    #vsp.SetParmVal( wid, "ThickChord", "XSecCurve_0", 0.12 )
-    #vsp.Update()
     code_str = Plane.airfoil_codes[final.airfoil_num]
     m, p, t = parse_naca_airfoil(code_str)
     vsp.SetParmVal( wid, "Camber", "XSecCurve_0", m )

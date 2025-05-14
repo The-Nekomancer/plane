@@ -192,29 +192,3 @@ class Plane:
         while self.drag < thrust: # if thrust from the motor is greater drag at velocity 'x'
             self.cruise_velocity = self.cruise_velocity * 1.001
             self.calc_drag()
-                
-        """
-        SYSTEM DESIGN METHODS
-        """
-        #################SYSTEM DESIGN METHODS#################################
-        # These are largely not used anymore but I might utilize certain parts later so I haven't removed them
-    def fusealge_sizing(self):
-        if (self.batteries % 2) == 0:
-            self.bat_skid_width = self.bat["width"] * 2
-        else:
-            self.bat_skid_width = self.bat["width"]
-        if self.bat_skid_width > self.payload_skid_width:
-            fuse_width = self.bat_skid_width
-        else: 
-            fuse_width = self.payload_skid_width
-        self.fuse_diam = 2 * fuse_width / np.sqrt(2)
-        if self.batteries >2:
-            self.bat_skid_length = self.bat["length"] * 2
-        else:
-            self.bat_skid_length = self.bat["length"]
-        ###OUTPUTS###
-        self.fuse_diam = 2 * fuse_width / np.sqrt(2)
-        self.fuse_length = self.payload_skid_length + self.bat_skid_length
-        self.nose_cone_length = self.fuse_length * 0.25
-        Plane.calc_mass(self)
-                
