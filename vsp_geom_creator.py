@@ -47,8 +47,6 @@ def vsp_geom_creator(final):
     vsp.SetParmVal(wid, "Z_Rel_Location", "XForm", final.fuse_diam/2)
     vsp.CutXSec( wid, 1 )
     vsp.SetDriverGroup( wid, 1, vsp.AREA_WSECT_DRIVER, vsp.ROOTC_WSECT_DRIVER, vsp.TIPC_WSECT_DRIVER )
-    # vsp.SetParmVal( wid, "Root_Chord", "XSec_1", final.chord_length )
-    # vsp.SetParmVal( wid, "Tip_Chord", "XSec_1", final.chord_length )
     vsp.SetParmVal( wid, "Sweep", "XSec_1", 0)
     vsp.SetParmVal( wid, "TotalSpan", "WingGeom", final.wingspan )
     
@@ -94,6 +92,5 @@ def vsp_geom_creator(final):
     vsp.SetParmVal(prop, "Z_Rel_Location", "XForm", -final.fuse_diam/6)
     vsp.SetParmVal(prop, "Diameter", "Design", 0.3 )
     vsp.Update()
-
     vsp.WriteVSPFile("genetic_alg.vsp3")
-    vsp_sim(final)
+    #vsp_sim(final)

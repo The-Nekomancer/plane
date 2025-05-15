@@ -83,6 +83,7 @@ class Plane:
                 throttle = 3,
                 motor_num = 0,
                 config = 'VTail',
+                taper = 0.4,
                 score = 0):
         self.name = name
         self.wingspan = wingspan
@@ -111,6 +112,7 @@ class Plane:
         self.alpha = alpha
         self.throttle = throttle
         self.motor_num = motor_num
+        self.taper = taper
         self.score = score
         
         """

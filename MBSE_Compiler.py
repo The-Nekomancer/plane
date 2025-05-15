@@ -9,8 +9,10 @@ PURPOSE: This is the master file that runs all other programs
 from GA import GA
 from Plane_Class import Plane
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 import pandas as pd
 import numpy as np
+from stl import mesh
 from fuse_equations import fuse_equations
 import time
 from performance_plotter import performance_plotter
@@ -46,8 +48,8 @@ range_obj = 50 #km
 
 '''Exports'''
 GA_plots = False
-export_to_VSP = False
-export_to_flight_stream = False
+export_to_VSP = True
+visualization = True
 export_to_solidworks = True
 
 '''Optimization'''
@@ -83,14 +85,14 @@ if export_to_VSP == True:
     from vsp_results_viewer import vsp_results_viewer
     vsp_geom_creator(true_final)
     time.sleep(5)
-    CL,CD,LD,Alpha = vsp_results_viewer()
-    performance_plotter(CL,CD,LD,Alpha,final)
+    #CL,CD,LD,Alpha = vsp_results_viewer()
+    #performance_plotter(CL,CD,LD,Alpha,final)
 
-"""Export to FlightStream"""
-if export_to_VSP and export_to_flight_stream == True:
+"""Visualization"""
+if export_to_VSP and visualization == True:
     '''create .igs file'''
-    #vsp.ExportFile("genetic_algorithm_model.igs", vsp.SET_ALL, vsp.EXPORT_IGES) 
-elif export_to_flight_stream ==True:
+    vsp.ExportFile("genetic_algorithm_model.stl", vsp.SET_ALL, vsp.EXPORT_STL) 
+elif visualization ==True:
     print("Biscuits")
 
 """Export to SolidWorks"""
@@ -125,3 +127,18 @@ print(f"Tail length: {str(final.tail_length)}"+ " m")
 # print(f"vtail length: {str(final.vtail_length)}")
 print(f"Ruddervator mass: {str(final.vtail_mass)}"+ " kg")
 print(f"Payload mass: {str(final.payload_mass)}"+ " kg")
+
+# Create a new plot
+figure = plt.figure()
+axes = figure.add_subplot(projection='3d')
+
+# Load the STL files and add the vectors to the plot
+your_mesh = mesh.Mesh.from_file('genetic_algorithm_model.stl')
+axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors))
+
+# Auto scale to the mesh size
+scale = your_mesh.points.flatten()
+axes.auto_scale_xyz(scale, scale, scale)
+
+# Show the plot to the screen
+plt.show()
